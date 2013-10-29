@@ -8,9 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-
 public class Event implements Serializable {
 
 	private static final long serialVersionUID = 3290441828635796018L;
