@@ -12,6 +12,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cascade;
+
 import pi.vocal.user.Grade;
 import pi.vocal.user.Location;
 
@@ -39,7 +41,7 @@ public class User implements Serializable {
 	@ManyToMany
 	@JoinTable(name="event_attendance",
 			joinColumns={@JoinColumn(name="userId")},
-			inverseJoinColumns={@JoinColumn(name="eventId")})	
+			inverseJoinColumns={@JoinColumn(name="eventId")})
 	private List<Event> events;
 	
 	public Location getSchoolLocation() {

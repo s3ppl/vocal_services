@@ -7,6 +7,7 @@ public enum Location {
 	RAVENSBURG("Ravensburg");
 	
 	private String name;
+	
 	private Location(String name) {
 		this.name = name;
 	}

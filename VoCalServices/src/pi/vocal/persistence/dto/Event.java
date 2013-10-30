@@ -3,11 +3,15 @@ package pi.vocal.persistence.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
+@Entity
+//table name needed to avoid case sensitivity errors in mysql DB
+@Table(name = "event")
 public class Event implements Serializable {
 
 	private static final long serialVersionUID = 3290441828635796018L;
