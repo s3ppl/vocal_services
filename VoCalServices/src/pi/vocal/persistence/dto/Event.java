@@ -19,8 +19,7 @@ public class Event implements Serializable {
 	@GeneratedValue
 	private long eventId;
 	
-	@ManyToMany
-	@JoinColumn(name="userId")
+	@ManyToMany(mappedBy="events")
 	private List<User> attendants;
 
 	public long getStartDate() {
