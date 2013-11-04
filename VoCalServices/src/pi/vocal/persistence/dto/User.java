@@ -12,10 +12,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.hibernate.annotations.Cascade;
-
 import pi.vocal.user.Grade;
 import pi.vocal.user.Location;
+import pi.vocal.user.Role;
 
 @Entity
 // table name needed to avoid case sensitivity errors in mysql DB
@@ -37,6 +36,8 @@ public class User implements Serializable {
 	
 	private String pwHash;
 	private String pwSalt;
+	
+	private Role role;
 	
 	@ManyToMany
 	@JoinTable(name="event_attendance",
@@ -98,6 +99,14 @@ public class User implements Serializable {
 	
 	public void setPwSalt(String pwSalt) {
 		this.pwSalt = pwSalt;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
 	}
 	
 }
