@@ -4,6 +4,8 @@ import java.util.List;
 
 import pi.vocal.user.Location;
 
+
+// TODO make me generic for enum usage
 public class LocationsDTO {
 
 	private List<Location> locations;

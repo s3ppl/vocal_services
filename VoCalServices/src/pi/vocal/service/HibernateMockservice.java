@@ -8,6 +8,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.DatatypeConverter;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -22,6 +23,10 @@ import pi.vocal.user.Location;
 @Path("/dbservice")
 public class HibernateMockservice {
 
+	private String convertToBase64(byte[] input) {
+		return DatatypeConverter.printBase64Binary(input);
+	}
+	
 	@GET
 	@Path("/testdb")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -33,19 +38,18 @@ public class HibernateMockservice {
 		User user1 = new User();
 		user1.setEmail("my@mail.com");
 		user1.setSchoolLocation(Location.STUTTGART);
-
-		String pwSalt = "";
+				
 		try {
-			pwSalt = new String(PasswordEncryptionHelper.generateSalt());
-
-			user1.setPwSalt(pwSalt);
-			user1.setPwHash(new String(PasswordEncryptionHelper
-					.getEncryptedPassword("foo", pwSalt.getBytes())));
+			byte[] pwSalt = PasswordEncryptionHelper.generateSalt();
+			byte[] encryptedPw = PasswordEncryptionHelper
+					.getEncryptedPassword("foo", pwSalt);
+			
+			user1.setPwSalt(convertToBase64(pwSalt));
+			user1.setPwHash(convertToBase64(encryptedPw));
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
 		Event event1 = new Event();
 		event1.setEventType(EventType.DEMO);
 		event1.setAttendants(Arrays.asList(user1));
@@ -67,6 +71,7 @@ public class HibernateMockservice {
 	public User getUser() throws NoSuchAlgorithmException, InvalidKeySpecException {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		User user = (User)session.get(User.class, 1L);
+		// TODO debug me!!!111 eins elf
 //		session.close();
 		
 		System.out.println("user=" + user);

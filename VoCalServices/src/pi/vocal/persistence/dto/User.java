@@ -31,7 +31,6 @@ public class User implements Serializable {
 	private String firstName;
 	private String lastName;
 	
-//	@Id
 	private String email;
 	
 	private Location schoolLocation;

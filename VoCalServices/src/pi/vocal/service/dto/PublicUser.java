@@ -1,9 +1,10 @@
 package pi.vocal.service.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonManagedReference;
-
+import pi.vocal.event.EventType;
+import pi.vocal.persistence.dto.Event;
 import pi.vocal.user.Grade;
 import pi.vocal.user.Location;
 import pi.vocal.user.Role;
@@ -19,9 +20,8 @@ public class PublicUser {
 	
 	private Role role;
 	
-	@JsonManagedReference
-	private List<PublicEvent> events;
-	
+	private List<UserEvent> userEvents = new ArrayList<>();
+		
 	public String getFirstName() {
 		return firstName;
 	}
@@ -58,10 +58,71 @@ public class PublicUser {
 	public void setRole(Role role) {
 		this.role = role;
 	}
-	public List<PublicEvent> getEvents() {
-		return events;
+	
+	public List<UserEvent> getEvents() {
+		return userEvents;
 	}
-	public void setEvents(List<PublicEvent> events) {
-		this.events = events;
+	
+	public void setEvents(List<Event> events) {
+		UserEvent userEvent = null;
+		for (Event event : events) {
+			userEvent = new UserEvent();
+			userEvent.setDescription(event.getDescription());
+			userEvent.setEndDate(event.getEndDate());
+			userEvent.setEventId(event.getEventId());
+			userEvent.setEventType(event.getEventType());
+			userEvent.setStartDate(event.getStartDate());
+			userEvent.setTitle(event.getTitle());
+		}
+		
+		this.userEvents.add(userEvent);
+	}
+	
+	class UserEvent {
+		private long startDate;
+		private long endDate;
+		
+		private String title;
+		private String description;
+
+		private EventType eventType; 
+		private long eventId;
+		
+		public long getStartDate() {
+			return startDate;
+		}
+		public void setStartDate(long startDate) {
+			this.startDate = startDate;
+		}
+		public long getEndDate() {
+			return endDate;
+		}
+		public void setEndDate(long endDate) {
+			this.endDate = endDate;
+		}
+		public String getTitle() {
+			return title;
+		}
+		public void setTitle(String title) {
+			this.title = title;
+		}
+		public String getDescription() {
+			return description;
+		}
+		public void setDescription(String description) {
+			this.description = description;
+		}
+		public EventType getEventType() {
+			return eventType;
+		}
+		public void setEventType(EventType eventType) {
+			this.eventType = eventType;
+		}
+		public long getEventId() {
+			return eventId;
+		}
+		public void setEventId(long eventId) {
+			this.eventId = eventId;
+		}
 	}
 }

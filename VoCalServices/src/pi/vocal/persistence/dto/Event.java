@@ -80,4 +80,10 @@ public class Event implements Serializable {
 	public void setEventType(EventType eventType) {
 		this.eventType = eventType;
 	}
+
+	public long getEventId() {
+		return eventId;
+	}
+	
+	
 }

@@ -1,5 +1,8 @@
 package pi.vocal.service;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -16,7 +19,6 @@ public class TestService {
 	@Path("/getUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	public User getTrackInJSON(@QueryParam("test") String test) {
-		
 		User track = new User();
 		track.setFirstName("Enter Sandman");
 		track.setLastName("Metallica");
@@ -29,14 +31,14 @@ public class TestService {
 	@GET
 	@Path("/getUserResponse")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<PublicUser> getUser() {
+	public JsonResponse<?> getUser() {
 		
 		PublicUser user = new PublicUser();
 		user.setEmail("foo@bar.de");
  
-		JsonResponse<PublicUser> response = new JsonResponse<>();
-		response.setContent(user);
-		response.setErrorCode(0);
+		JsonResponse<List<PublicUser>> response = new JsonResponse<>();
+		response.setContent(Arrays.asList(user));
+		response.setSucess(1);
 		
 		return response;
 	}

@@ -2,14 +2,14 @@ package pi.vocal.service;
 
 public class JsonResponse<T> {
 
-	private int errorCode;
+	private int sucess;
 	private T content;
 	
-	public int getErrorCode() {
-		return errorCode;
+	public int getSucess() {
+		return sucess;
 	}
-	public void setErrorCode(int errorCode) {
-		this.errorCode = errorCode;
+	public void setSucess(int errorCode) {
+		this.sucess = errorCode;
 	}
 	public T getContent() {
 		return content;
