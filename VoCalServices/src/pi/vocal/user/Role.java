@@ -2,6 +2,6 @@ package pi.vocal.user;
 
 public enum Role {
 
-	ADMIN, USER;
+	ADMIN, USER, MANAGER;
 	
 }

@@ -1,23 +1,12 @@
-package pi.vocal.persistence.dto;
+package pi.vocal.service.dto;
 
-import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import org.codehaus.jackson.annotate.JsonBackReference;
 
 import pi.vocal.event.EventType;
 
-@Entity
-//table name needed to avoid case sensitivity errors in mysql DB
-@Table(name = "event")
-public class Event implements Serializable {
-
-	private static final long serialVersionUID = 3290441828635796018L;
-
+public class PublicEvent {
 	private long startDate;
 	private long endDate;
 	
@@ -25,13 +14,11 @@ public class Event implements Serializable {
 	private String description;
 	
 	private EventType eventType; 
-	
-	@Id
-	@GeneratedValue
+
 	private long eventId;
 	
-	@ManyToMany(mappedBy="events")
-	private List<User> attendants;
+	@JsonBackReference
+	private List<PublicUser> attendants;
 
 	public long getStartDate() {
 		return startDate;
@@ -47,14 +34,6 @@ public class Event implements Serializable {
 
 	public void setEndDate(long endDate) {
 		this.endDate = endDate;
-	}
-
-	public List<User> getAttendants() {
-		return attendants;
-	}
-
-	public void setAttendants(List<User> attendants) {
-		this.attendants = attendants;
 	}
 
 	public String getTitle() {
@@ -79,5 +58,21 @@ public class Event implements Serializable {
 
 	public void setEventType(EventType eventType) {
 		this.eventType = eventType;
+	}
+
+	public long getEventId() {
+		return eventId;
+	}
+
+	public void setEventId(long eventId) {
+		this.eventId = eventId;
+	}
+
+	public List<PublicUser> getAttendants() {
+		return attendants;
+	}
+
+	public void setAttendants(List<PublicUser> attendants) {
+		this.attendants = attendants;
 	}
 }

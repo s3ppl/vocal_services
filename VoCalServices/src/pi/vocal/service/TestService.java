@@ -1,8 +1,5 @@
 package pi.vocal.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -10,6 +7,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import pi.vocal.persistence.dto.User;
+import pi.vocal.service.dto.PublicUser;
 
 @Path("/TestService")
 public class TestService {
@@ -20,13 +18,29 @@ public class TestService {
 	public User getTrackInJSON(@QueryParam("test") String test) {
 		
 		User track = new User();
-		track.setPrename("Enter Sandman");
-		track.setSurname("Metallica");
+		track.setFirstName("Enter Sandman");
+		track.setLastName("Metallica");
 		
 		track.setEmail(test);
  
 		return track;
 	}
+	
+	@GET
+	@Path("/getUserResponse")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JsonResponse<PublicUser> getUser() {
+		
+		PublicUser user = new PublicUser();
+		user.setEmail("foo@bar.de");
+ 
+		JsonResponse<PublicUser> response = new JsonResponse<>();
+		response.setContent(user);
+		response.setErrorCode(0);
+		
+		return response;
+	}
+	
 	
 //	@GET
 //	@Path("/getLocations")

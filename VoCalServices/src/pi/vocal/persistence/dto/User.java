@@ -3,6 +3,7 @@ package pi.vocal.persistence.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -29,6 +30,8 @@ public class User implements Serializable {
 	
 	private String firstName;
 	private String lastName;
+	
+//	@Id
 	private String email;
 	
 	private Location schoolLocation;
@@ -39,7 +42,7 @@ public class User implements Serializable {
 	
 	private Role role;
 	
-	@ManyToMany
+	@ManyToMany(cascade=CascadeType.ALL)
 	@JoinTable(name="event_attendance",
 			joinColumns={@JoinColumn(name="userId")},
 			inverseJoinColumns={@JoinColumn(name="eventId")})
@@ -53,19 +56,19 @@ public class User implements Serializable {
 		this.schoolLocation = schoolLocation;
 	}
 	
-	public String getPrename() {
+	public String getFirstName() {
 		return firstName;
 	}
 	
-	public void setPrename(String prename) {
+	public void setFirstName(String prename) {
 		this.firstName = prename;
 	}
 	
-	public String getSurname() {
+	public String getLastName() {
 		return lastName;
 	}
 	
-	public void setSurname(String surname) {
+	public void setLastName(String surname) {
 		this.lastName = surname;
 	}
 	
@@ -107,6 +110,14 @@ public class User implements Serializable {
 
 	public void setRole(Role role) {
 		this.role = role;
+	}
+
+	public List<Event> getEvents() {
+		return events;
+	}
+
+	public void setEvents(List<Event> events) {
+		this.events = events;
 	}
 	
 }
