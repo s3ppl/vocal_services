@@ -72,6 +72,7 @@ public class PublicEvent {
 		return attendants;
 	}
 	
+	// TODO improve variable names - too confusing
 	public void setAttendents(List<PublicUser> attendants) {
 		EventUser attendant = null;
 		for (PublicUser publicUser : attendants) {
@@ -82,6 +83,8 @@ public class PublicEvent {
 			attendant.setLastName(publicUser.getLastName());
 			attendant.setRole(publicUser.getRole());
 			attendant.setSchoolLocation(publicUser.getSchoolLocation());
+			
+			this.attendants.add(attendant);
 		}
 	}
 	
