@@ -31,6 +31,8 @@ public class UserManagement {
 			userDto.setLastName(user.getLastName());
 			userDto.setEmail(user.getEmail());
 			userDto.setRole(Role.USER);
+			userDto.setGrade(user.getGrade());
+			userDto.setSchoolLocation(user.getSchoolLocation());
 
 			byte[] pwSalt = PasswordEncryptionHelper.generateSalt();
 			byte[] encryptedPw = PasswordEncryptionHelper.getEncryptedPassword(
@@ -44,8 +46,8 @@ public class UserManagement {
 			session.getTransaction().commit();
 		} catch (HibernateException | NoSuchAlgorithmException
 				| InvalidKeySpecException he) {
-			session.getTransaction().rollback();
 			
+			session.getTransaction().rollback();
 			throw new AccountCreationException("Could not create Account. See nested Exception for further details.", he);
 		}
 	}

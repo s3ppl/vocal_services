@@ -15,6 +15,10 @@ import pi.vocal.user.Location;
 
 @Path("/UserMgmt")
 public class UserService {
+	
+	public UserService() {
+		System.out.println("foo");
+	}
 
 	@GET
 	@Path("/createUser")
@@ -26,11 +30,16 @@ public class UserService {
 			@QueryParam("grade") Grade grade,
 			@QueryParam("location") Location location) {
 		
+		System.out.println(grade);
+		System.out.println(location);
+		System.out.println(location.getName());
+		
 		PublicUser user = new PublicUser();
 		user.setEmail(mail);
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
 		user.setSchoolLocation(location);
+		user.setGrade(grade);
 		
 		JsonResponse<String> response = new JsonResponse<>();
 		response.setSucess(1);
@@ -39,6 +48,13 @@ public class UserService {
 			UserManagement.createUser(user, password);
 		} catch (AccountCreationException e) {
 			response.setSucess(0);
+			
+			Throwable t = e;
+			while (null != t.getCause()) {
+				t = t.getCause();
+			}
+			
+			response.setContent(t.getMessage());
 		}
 		
 		return response;
