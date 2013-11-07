@@ -18,7 +18,9 @@ import pi.vocal.management.PasswordEncryptionHelper;
 import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
+import pi.vocal.user.Grade;
 import pi.vocal.user.Location;
+import pi.vocal.user.Role;
 
 @Path("/dbservice")
 public class HibernateMockservice {
@@ -38,6 +40,11 @@ public class HibernateMockservice {
 		User user1 = new User();
 		user1.setEmail("my@mail.com");
 		user1.setSchoolLocation(Location.STUTTGART);
+		user1.setFirstName("foo");
+		user1.setLastName("bar");
+		user1.setGrade(Grade.DISCIPLE);
+		user1.setSchoolLocation(Location.MUEHLACKER);
+		user1.setRole(Role.USER);
 
 		try {
 			byte[] pwSalt = PasswordEncryptionHelper.generateSalt();
@@ -52,6 +59,9 @@ public class HibernateMockservice {
 
 		Event event1 = new Event();
 		event1.setEventType(EventType.DEMO);
+		event1.setStartDate(System.currentTimeMillis());
+		event1.setEndDate(System.currentTimeMillis() + 1000);
+		event1.setTitle("MyEvent");
 		event1.setAttendants(Arrays.asList(user1));
 		user1.setEvents(Arrays.asList(event1));
 

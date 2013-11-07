@@ -5,6 +5,7 @@ import java.util.List;
 
 import pi.vocal.event.EventType;
 import pi.vocal.persistence.dto.Event;
+import pi.vocal.persistence.dto.User;
 import pi.vocal.user.Grade;
 import pi.vocal.user.Location;
 import pi.vocal.user.Role;
@@ -21,7 +22,20 @@ public class PublicUser {
 	private Role role;
 	
 	private List<UserEvent> userEvents = new ArrayList<>();
+	
+	public PublicUser() {}
+	
+	public PublicUser(User user) {
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+		this.email = user.getEmail();
+		this.schoolLocation = user.getSchoolLocation();
+		this.grade = user.getGrade();
+		this.role = user.getRole();
 		
+		setEvents(user.getEvents());
+	}
+	
 	public String getFirstName() {
 		return firstName;
 	}

@@ -3,6 +3,7 @@ package pi.vocal.persistence.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -18,12 +19,18 @@ public class Event implements Serializable {
 
 	private static final long serialVersionUID = 3290441828635796018L;
 
+	@Column(nullable=false)
 	private long startDate;
+	
+	@Column(nullable=false)
 	private long endDate;
 	
+	@Column(nullable=false)
 	private String title;
+	
 	private String description;
 	
+	@Column(nullable=false)
 	private EventType eventType; 
 	
 	@Id

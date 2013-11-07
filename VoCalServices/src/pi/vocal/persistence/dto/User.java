@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -28,20 +30,31 @@ public class User implements Serializable {
 	@GeneratedValue
 	private long userId;
 	
+	@Column(nullable=false)
 	private String firstName;
+	
+	@Column(nullable=false)
 	private String lastName;
 	
+	@Column(nullable=false)
 	private String email;
 	
+	@Column(nullable=false)
 	private Location schoolLocation;
+	
+	@Column(nullable=false)
 	private Grade grade;
 	
+	@Column(nullable=false)
 	private String pwHash;
+	
+	@Column(nullable=false)
 	private String pwSalt;
 	
+	@Column(nullable=false)
 	private Role role;
 	
-	@ManyToMany(cascade=CascadeType.ALL)
+	@ManyToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
 	@JoinTable(name="event_attendance",
 			joinColumns={@JoinColumn(name="userId")},
 			inverseJoinColumns={@JoinColumn(name="eventId")})
