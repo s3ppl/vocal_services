@@ -26,7 +26,7 @@ public class HibernateMockservice {
 	private String convertToBase64(byte[] input) {
 		return DatatypeConverter.printBase64Binary(input);
 	}
-	
+
 	@GET
 	@Path("/testdb")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -38,18 +38,18 @@ public class HibernateMockservice {
 		User user1 = new User();
 		user1.setEmail("my@mail.com");
 		user1.setSchoolLocation(Location.STUTTGART);
-				
+
 		try {
 			byte[] pwSalt = PasswordEncryptionHelper.generateSalt();
-			byte[] encryptedPw = PasswordEncryptionHelper
-					.getEncryptedPassword("foo", pwSalt);
-			
+			byte[] encryptedPw = PasswordEncryptionHelper.getEncryptedPassword(
+					"foo", pwSalt);
+
 			user1.setPwSalt(convertToBase64(pwSalt));
 			user1.setPwHash(convertToBase64(encryptedPw));
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			e.printStackTrace();
 		}
-		
+
 		Event event1 = new Event();
 		event1.setEventType(EventType.DEMO);
 		event1.setAttendants(Arrays.asList(user1));
@@ -68,35 +68,41 @@ public class HibernateMockservice {
 	@GET
 	@Path("/getUser")
 	@Produces(MediaType.APPLICATION_JSON)
-	public User getUser() throws NoSuchAlgorithmException, InvalidKeySpecException {
+	public User getUser() throws NoSuchAlgorithmException,
+			InvalidKeySpecException {
+		
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		User user = (User)session.get(User.class, 1L);
-		// TODO debug me!!!111 eins elf
-//		session.close();
+		User user = (User) session.get(User.class, 1L);
 		
-		System.out.println("user=" + user);
-		System.out.println("hash=" + user.getPwHash());
-		System.out.println("salt=" + user.getPwSalt());
-		
-		assert(!user.equals(null));
-		
-		System.out.println(PasswordEncryptionHelper.authenticate("foo", user.getPwHash().getBytes(), user.getPwSalt().getBytes()));
-		
+		// FIXME why cant the session be closed?
+		// session.close();
+
+		if (null != user) {
+			System.out.println("user=" + user);
+			System.out.println("hash=" + user.getPwHash());
+			System.out.println("salt=" + user.getPwSalt());
+		}
+
+		System.out.println(PasswordEncryptionHelper.authenticate("foo", user
+				.getPwHash().getBytes(), user.getPwSalt().getBytes()));
+
 		return user;
 	}
-	
+
 	@GET
 	@Path("/getEvent")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Event getEvent() throws NoSuchAlgorithmException, InvalidKeySpecException {
+	public Event getEvent() throws NoSuchAlgorithmException,
+			InvalidKeySpecException {
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		Event event = (Event)session.get(Event.class, 1L);
-//		session.close();
-		
-		assert(!event.equals(null));
-		
-//		System.out.println(PasswordEncryptionHelper.authenticate("foo", user.getPwHash().getBytes(), user.getPwSalt().getBytes()));
-		
+		Event event = (Event) session.get(Event.class, 1L);
+		// session.close();
+
+		assert (!event.equals(null));
+
+		// System.out.println(PasswordEncryptionHelper.authenticate("foo",
+		// user.getPwHash().getBytes(), user.getPwSalt().getBytes()));
+
 		return event;
 	}
 }
