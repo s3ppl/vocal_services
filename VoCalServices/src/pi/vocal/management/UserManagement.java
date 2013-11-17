@@ -12,6 +12,8 @@ import pi.vocal.management.exception.AccountCreationException;
 import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.service.dto.PublicUser;
+import pi.vocal.user.Grade;
+import pi.vocal.user.Location;
 import pi.vocal.user.Role;
 
 public class UserManagement {
@@ -20,22 +22,21 @@ public class UserManagement {
 		return DatatypeConverter.printBase64Binary(input);
 	}
 
-	// TODO refactor the method so that no user is given but his attributes (input of webservice)
 	// TODO add error handling of invalid user attributes to this method. return a list of error codes or null
-	public static void createUser(PublicUser user, String password)
+	public static void createUser(String firstName, String lastName, String email, Grade grade, Location schoolLocation, String password)
 			throws AccountCreationException {
 
 		Session session = null;
 		try {
 			session = HibernateUtil.getSessionFactory().getCurrentSession();
-
+			
 			User userDto = new User();
-			userDto.setFirstName(user.getFirstName());
-			userDto.setLastName(user.getLastName());
-			userDto.setEmail(user.getEmail());
+			userDto.setFirstName(firstName);
+			userDto.setLastName(lastName);
+			userDto.setEmail(email);
 			userDto.setRole(Role.USER);
-			userDto.setGrade(user.getGrade());
-			userDto.setSchoolLocation(user.getSchoolLocation());
+			userDto.setGrade(grade);
+			userDto.setSchoolLocation(schoolLocation);
 
 			byte[] pwSalt = PasswordEncryptionHelper.generateSalt();
 			byte[] encryptedPw = PasswordEncryptionHelper.getEncryptedPassword(

@@ -19,46 +19,40 @@ import pi.vocal.user.Location;
 
 @Path("/UserMgmt")
 public class UserService {
-	
+
 	public UserService() {
 		System.out.println("foo");
 	}
 
-	// TODO change this method so that no PublicUser is required anymore - just pass the parameters to the UserManagement
 	@GET
-//	@POST
+	// @POST
 	@Path("/createUser")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<List<ErrorCode>> createAccount(@QueryParam("firstname") String firstName,
+	public JsonResponse<List<ErrorCode>> createAccount(
+			@QueryParam("firstname") String firstName,
 			@QueryParam("lastname") String lastName,
 			@QueryParam("mail") String mail,
 			@QueryParam("password") String password,
 			@QueryParam("grade") Grade grade,
 			@QueryParam("location") Location location) {
-		
+
 		List<ErrorCode> errors = new ArrayList<>();
-		
-		PublicUser user = new PublicUser();
-		user.setEmail(mail);
-		user.setFirstName(firstName);
-		user.setLastName(lastName);
-		user.setSchoolLocation(location);
-		user.setGrade(grade);
-		
+
 		JsonResponse<List<ErrorCode>> response = new JsonResponse<>();
 		response.setSuccess(1);
-		
+
 		try {
-			UserManagement.createUser(user, password);
+			UserManagement.createUser(firstName, lastName, mail, grade,
+					location, password);
 		} catch (AccountCreationException e) {
 			errors.add(e.getErrorCode());
 		}
-		
+
 		return response;
 	}
-	
+
 	@GET
-//	@POST
+	// @POST
 	@Path("/getUserById")
 	@Produces(MediaType.APPLICATION_JSON)
 	public PublicUser getUserById(@QueryParam("id") long userId) {

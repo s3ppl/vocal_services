@@ -15,6 +15,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import pi.vocal.user.Grade;
 import pi.vocal.user.Location;
 import pi.vocal.user.Role;
@@ -22,6 +24,7 @@ import pi.vocal.user.Role;
 @Entity
 // table name needed to avoid case sensitivity errors in mysql DB
 @Table(name = "user", uniqueConstraints = { @UniqueConstraint(columnNames = "email") })
+@JsonIgnoreProperties({"pwHash", "pwSalt"})
 public class User implements Serializable {
 
 	private static final long serialVersionUID = 6684430286499464672L;
