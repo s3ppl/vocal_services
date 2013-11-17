@@ -20,7 +20,10 @@ public class UserManagement {
 		return DatatypeConverter.printBase64Binary(input);
 	}
 
-	public static void createUser(PublicUser user, String password) throws AccountCreationException {
+	// TODO refactor the method so that no user is given but his attributes (input of webservice)
+	// TODO add error handling of invalid user attributes to this method. return a list of error codes or null
+	public static void createUser(PublicUser user, String password)
+			throws AccountCreationException {
 
 		Session session = null;
 		try {
@@ -46,9 +49,12 @@ public class UserManagement {
 			session.getTransaction().commit();
 		} catch (HibernateException | NoSuchAlgorithmException
 				| InvalidKeySpecException he) {
-			
+
 			session.getTransaction().rollback();
-			throw new AccountCreationException("Could not create Account. See nested Exception for further details.", he);
+			throw new AccountCreationException(
+					ErrorCode.INTERNAL_ERROR,
+					"Could not create Account. See nested Exception for further details.",
+					he);
 		}
 	}
 

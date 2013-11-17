@@ -38,7 +38,7 @@ public class TestService {
  
 		JsonResponse<List<PublicUser>> response = new JsonResponse<>();
 		response.setContent(Arrays.asList(user));
-		response.setSucess(1);
+		response.setSuccess(1);
 		
 		return response;
 	}
