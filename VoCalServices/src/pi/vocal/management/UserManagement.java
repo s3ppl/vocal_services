@@ -21,7 +21,7 @@ import pi.vocal.user.Location;
 import pi.vocal.user.Role;
 
 public class UserManagement {
-
+	
 	/**
 	 * Minimum length a password must have
 	 */

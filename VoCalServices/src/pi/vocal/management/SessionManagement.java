@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.jboss.logging.Logger;
+
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.management.helper.PasswordEncryptionHelper;
 import pi.vocal.persistence.dto.User;
@@ -19,6 +21,7 @@ import pi.vocal.persistence.dto.User;
  * 
  */
 public class SessionManagement {
+	private final static Logger LOGGER = Logger.getLogger(SessionManagement.class);
 
 	/**
 	 * Maximum amount of tries to create a unique session id
@@ -49,6 +52,25 @@ public class SessionManagement {
 		}
 
 		return exists;
+	}
+
+	/**
+	 * Removes the session id of the user with given mail address if any.
+	 * 
+	 * @param email
+	 *            The email address of the user that should be removed if
+	 *            already logged in
+	 */
+	private static void removeAlreadyLoggedInUser(String email) {
+		for (UUID id : sessions.keySet()) {
+			if (sessions.get(id).getEmail().equals(email)) {
+				if (LOGGER.isInfoEnabled()) {
+					LOGGER.info("User was already logged in. Remove session id: " + id.toString());
+				}
+				
+				sessions.remove(email);
+			}
+		}
 	}
 
 	/**
@@ -107,6 +129,9 @@ public class SessionManagement {
 	public synchronized static UUID login(String email, String password)
 			throws VocalServiceException {
 
+		// make sure the user won't get logged in twice
+		removeAlreadyLoggedInUser(email);
+		
 		// get the according user from the database
 		User user = UserManagement.getUserByEmail(email);
 
@@ -125,6 +150,7 @@ public class SessionManagement {
 				throw new VocalServiceException(ErrorCode.AUTHENTICATION_FAILED);
 			}
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			LOGGER.error("Password encryption failed.", e);
 			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, e);
 		}
 
