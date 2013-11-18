@@ -8,7 +8,6 @@ import java.util.Arrays;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import javax.xml.bind.DatatypeConverter;
 
 public class PasswordEncryptionHelper {
 

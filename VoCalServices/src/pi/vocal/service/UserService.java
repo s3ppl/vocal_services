@@ -2,13 +2,10 @@ package pi.vocal.service;
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.jboss.logging.Logger;
@@ -16,7 +13,6 @@ import org.jboss.logging.Logger;
 import pi.vocal.management.ErrorCode;
 import pi.vocal.management.UserManagement;
 import pi.vocal.management.exception.VocalServiceException;
-import pi.vocal.service.dto.PublicUser;
 import pi.vocal.user.Grade;
 import pi.vocal.user.Location;
 

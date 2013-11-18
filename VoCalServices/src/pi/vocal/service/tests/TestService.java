@@ -1,9 +1,10 @@
 package pi.vocal.service.tests;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -48,25 +49,27 @@ public class TestService {
 		return response;
 	}
 	
-	@GET
-	@Path("/login")
-	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<?> login(@QueryParam("email") String email, @QueryParam("password") String password) {
-		JsonResponse<String> response = new JsonResponse<>();
-		response.setSuccess(true);
-		
-		try {
-			response.setContent(SessionManagement.login(email, password));
-		} catch (VocalServiceException e) {
-			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
-			errorResponse.setSuccess(false);
-			errorResponse.setContent(e.getErrorCodes());
-			
-			return errorResponse;
-		}
-		
-		return response;		
-	}
+//	@GET
+//	@Path("/login")
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public JsonResponse<?> login(@QueryParam("email") String email, @QueryParam("password") String password) {
+//		JsonResponse<String> response = new JsonResponse<>();
+//		response.setSuccess(true);
+//		
+//		try {
+//			response.setContent(SessionManagement.login(email, password).toString());
+//		} catch (VocalServiceException e) {
+//			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
+//			errorResponse.setSuccess(false);
+//			errorResponse.setContent(e.getErrorCodes());
+//			
+//			return errorResponse;
+//		}
+//		
+//		System.out.println(UUID.randomUUID().toString());
+//		
+//		return response;		
+//	}
 	
 	
 //	@GET
