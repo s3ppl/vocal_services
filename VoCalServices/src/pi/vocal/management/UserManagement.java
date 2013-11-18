@@ -9,6 +9,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 import pi.vocal.management.exception.AccountCreationException;
 import pi.vocal.persistence.HibernateUtil;
@@ -22,8 +23,21 @@ public class UserManagement {
 
 	private static final int MIN_PW_LEN = 6;
 
+	private static final String EMAIL_MATCH_STRING = "^[0-9A-Za-z_\\-.]+@[0-9A-Za-z_\\-.]+\\.[0-9A-Za-z_\\-.]+$";
+
 	private static String convertToBase64(byte[] input) {
 		return DatatypeConverter.printBase64Binary(input);
+	}
+
+	private static User getUserByEmail(String email) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		session.beginTransaction();
+		User user = (User) session.createCriteria(User.class)
+				.add(Restrictions.eq("email", email)).uniqueResult();
+		session.getTransaction().commit();
+		session.close();
+
+		return user;
 	}
 
 	private static List<ErrorCode> verifyUserInput(User user, String password) {
@@ -39,6 +53,10 @@ public class UserManagement {
 
 		if (null == user.getEmail() || user.getEmail().isEmpty()) {
 			errorCodes.add(ErrorCode.EMAIL_MISSING);
+		} else if (!user.getEmail().matches(EMAIL_MATCH_STRING)) {
+			errorCodes.add(ErrorCode.EMAIL_INVALID);
+		} else if (!(null == getUserByEmail(user.getEmail()))) {
+			errorCodes.add(ErrorCode.EMAIL_ALREADY_IN_USE);
 		}
 
 		if (null == user.getGrade()) {
@@ -96,15 +114,13 @@ public class UserManagement {
 		return userDto;
 	}
 
-	// TODO add error handling of invalid user attributes to this method. return
-	// a list of error codes or null
 	public static void createUser(String firstName, String lastName,
 			String email, Grade grade, Location schoolLocation, String password)
 			throws AccountCreationException {
 
 		Session session = null;
 		try {
-			session = HibernateUtil.getSessionFactory().getCurrentSession();
+			session = HibernateUtil.getSessionFactory().openSession();
 
 			User userDto = createUserFromUserInput(firstName, lastName, email,
 					grade, schoolLocation, password);
@@ -112,8 +128,12 @@ public class UserManagement {
 			session.beginTransaction();
 			session.save(userDto);
 			session.getTransaction().commit();
+			session.close();
 		} catch (HibernateException he) {
-			session.getTransaction().rollback();
+			if (null != session && session.isOpen()) {				
+				session.getTransaction().rollback();
+			}
+			
 			throw new AccountCreationException(
 					ErrorCode.INTERNAL_ERROR,
 					"Could not create Account. Storing in the database failed. See nested Exception for further details.",
@@ -122,10 +142,11 @@ public class UserManagement {
 	}
 
 	public static PublicUser getUserById(long id) {
-		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
 		User user = (User) session.get(User.class, id);
 		session.getTransaction().commit();
+		session.close();
 
 		return new PublicUser(user);
 	}

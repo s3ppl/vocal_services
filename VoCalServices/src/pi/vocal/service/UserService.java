@@ -9,6 +9,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.jboss.logging.Logger;
+
 import pi.vocal.management.ErrorCode;
 import pi.vocal.management.UserManagement;
 import pi.vocal.management.exception.AccountCreationException;
@@ -19,6 +21,8 @@ import pi.vocal.user.Location;
 @Path("/UserMgmt")
 public class UserService {
 
+	private static final Logger LOGGER = Logger.getLogger(UserService.class);
+	
 	@GET
 	// @POST
 	@Path("/createUser")
@@ -42,6 +46,8 @@ public class UserService {
 			UserManagement.createUser(firstName, lastName, email, grade,
 					location, password);
 		} catch (AccountCreationException e) {
+			LOGGER.error("Nested Exception", e.getCause());
+			
 			errors = e.getErrorCodes();
 			response.setSuccess(0);
 		}

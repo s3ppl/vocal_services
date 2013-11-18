@@ -9,6 +9,8 @@ public enum ErrorCode {
 	GRADE_MISSING,
 	SCHOOL_MISSING,
 	EMAIL_MISSING,
+	EMAIL_ALREADY_IN_USE,
+	EMAIL_INVALID,
 	INTERNAL_ERROR;
 	
 //	private String displayText;
