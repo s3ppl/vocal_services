@@ -1,6 +1,5 @@
 package pi.vocal.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -20,10 +19,6 @@ import pi.vocal.user.Location;
 @Path("/UserMgmt")
 public class UserService {
 
-	public UserService() {
-		System.out.println("foo");
-	}
-
 	@GET
 	// @POST
 	@Path("/createUser")
@@ -31,22 +26,27 @@ public class UserService {
 	public JsonResponse<List<ErrorCode>> createAccount(
 			@QueryParam("firstname") String firstName,
 			@QueryParam("lastname") String lastName,
-			@QueryParam("mail") String mail,
+			@QueryParam("email") String email,
 			@QueryParam("password") String password,
 			@QueryParam("grade") Grade grade,
 			@QueryParam("location") Location location) {
 
-		List<ErrorCode> errors = new ArrayList<>();
+		List<ErrorCode> errors = null;
 
 		JsonResponse<List<ErrorCode>> response = new JsonResponse<>();
 		response.setSuccess(1);
 
+		System.out.println("DEBUG0");
+		
 		try {
-			UserManagement.createUser(firstName, lastName, mail, grade,
+			UserManagement.createUser(firstName, lastName, email, grade,
 					location, password);
 		} catch (AccountCreationException e) {
-			errors.add(e.getErrorCode());
+			errors = e.getErrorCodes();
+			response.setSuccess(0);
 		}
+		
+		response.setContent(errors);
 
 		return response;
 	}
