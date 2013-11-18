@@ -12,24 +12,41 @@ import javax.persistence.Table;
 
 import pi.vocal.event.EventType;
 
+/**
+ * JavaBean like class, that will be used by Hibernate to store users.
+ * 
+ * NOTE: Table name has to be manually added, since the used MySql database has issues with capitals.
+ *  
+ * @author s3ppl
+ *
+ */
+
 @Entity
-//table name needed to avoid case sensitivity errors in mysql DB
 @Table(name = "event")
 public class Event implements Serializable {
 
 	private static final long serialVersionUID = 3290441828635796018L;
 
+	/**
+	 * The date the event starts in its unix-time representation
+	 */
 	@Column(nullable=false)
 	private long startDate;
-	
+
+	/**
+	 * The date the event ends in its unix-time representation
+	 */
 	@Column(nullable=false)
 	private long endDate;
-	
+
 	@Column(nullable=false)
 	private String title;
 	
+	/**
+	 * Optional description of the event
+	 */
 	private String description;
-	
+
 	@Column(nullable=false)
 	private EventType eventType; 
 	

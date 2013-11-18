@@ -16,11 +16,33 @@ import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.user.Grade;
 import pi.vocal.user.Location;
 
+/**
+ * 
+ * @author s3ppl
+ * 
+ */
 @Path("/UserMgmt")
 public class UserService {
-
 	private static final Logger LOGGER = Logger.getLogger(UserService.class);
-	
+
+	/**
+	 * This webservice creates a new user account with the given information.
+	 * 
+	 * @param firstName
+	 *            The firstname of the user
+	 * @param lastName
+	 *            The lastname of the user
+	 * @param email
+	 *            The email address of the user
+	 * @param password
+	 *            The password of the user
+	 * @param grade
+	 *            The grade of the user according to his basis belt color
+	 * @param location
+	 *            The location of the school, the user trains
+	 * @return A list of {@code ErrorCode} which contains all errors, the users
+	 *         input has, like no password.
+	 */
 	@GET
 	// @POST
 	@Path("/createUser")
@@ -42,8 +64,12 @@ public class UserService {
 			UserManagement.createUser(firstName, lastName, email, grade,
 					location, password);
 		} catch (VocalServiceException e) {
-			if (null != e.getCause()) {
-				LOGGER.error("Nested Exception", e.getCause());
+			if (e.getErrorCodes().size() == 1
+					&& e.getErrorCodes().get(0) == ErrorCode.INTERNAL_ERROR) {
+
+				LOGGER.error(
+						"An internal error occurred. See nested exceptions for details.",
+						e.getCause());
 			}
 
 			errors = e.getErrorCodes();
@@ -58,24 +84,33 @@ public class UserService {
 	@GET
 	@Path("/editUser")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<List<ErrorCode>> editAccount() {		
+	public JsonResponse<List<ErrorCode>> editAccount() {
+		// TODO implement me!
 		return null;
 	}
-	
-//	@GET
-//	// @POST
-//	@Path("/getUserById")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public PublicUser getUserById(@QueryParam("id") long userId) {
-//		return UserManagement.getUserById(userId);
-//	}
-//
-//	@GET
-//	// @POST
-//	@Path("/getUserByEmail")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public PublicUser getUserByEmail(@QueryParam("email") String email) {
-//		return UserManagement.getUserByEmail(email);
-//	}
+
+	@GET
+	@Path("/deleteUser")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JsonResponse<List<ErrorCode>> deleteAccount() {
+		// TODO implement me!
+		return null;
+	}
+
+	// @GET
+	// // @POST
+	// @Path("/getUserById")
+	// @Produces(MediaType.APPLICATION_JSON)
+	// public PublicUser getUserById(@QueryParam("id") long userId) {
+	// return UserManagement.getUserById(userId);
+	// }
+	//
+	// @GET
+	// // @POST
+	// @Path("/getUserByEmail")
+	// @Produces(MediaType.APPLICATION_JSON)
+	// public PublicUser getUserByEmail(@QueryParam("email") String email) {
+	// return UserManagement.getUserByEmail(email);
+	// }
 
 }

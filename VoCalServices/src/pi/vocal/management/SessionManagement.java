@@ -12,12 +12,32 @@ import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.management.helper.PasswordEncryptionHelper;
 import pi.vocal.persistence.dto.User;
 
+/**
+ * This class handles the login and logout of a user.
+ * 
+ * @author s3ppl
+ * 
+ */
 public class SessionManagement {
 
+	/**
+	 * Maximum amount of tries to create a unique session id
+	 */
 	private static final int MAX_SESSION_ID_CREATION_CYCLES = 20000;
 
+	/**
+	 * The current user sessions are stored in this map, where the key is the id
+	 * of the session
+	 */
 	private static Map<UUID, User> sessions = new ConcurrentHashMap<UUID, User>();
 
+	/**
+	 * Searches for a given session id in the sessions map.
+	 * 
+	 * @param sessionId
+	 *            The id to search
+	 * @return {@code true} if the id is found, {@code false} otherwise
+	 */
 	private static boolean sessionIdExists(UUID sessionId) {
 		boolean exists = false;
 
@@ -31,6 +51,15 @@ public class SessionManagement {
 		return exists;
 	}
 
+	/**
+	 * Generates a unique session id. If the generated id is already in use, a
+	 * new will be generated.
+	 * 
+	 * @return A unique session id
+	 * @throws VocalServiceException
+	 *             Thrown if the maximum attempts of creation a unique session
+	 *             id get reached.
+	 */
 	private static UUID generateSessionId() throws VocalServiceException {
 		UUID sessionId = null;
 		boolean done = false;
@@ -51,20 +80,43 @@ public class SessionManagement {
 		return sessionId;
 	}
 
+	/**
+	 * Converts a given {@code String}, that is encoded with base64 to a byte
+	 * array.
+	 * 
+	 * @param input
+	 *            The string to convert
+	 * @return A byte array, representing the given {@code String}.
+	 */
 	private static byte[] convertFromBase64(String input) {
 		return DatatypeConverter.parseBase64Binary(input);
 	}
 
+	/**
+	 * Handles the login of user.
+	 * 
+	 * @param email
+	 *            The email address of the user
+	 * @param password
+	 *            The password of the user
+	 * @return A new session id, that will be used after the login
+	 * @throws VocalServiceException
+	 *             Thrown if either the authentication of the user failed or an
+	 *             internal error occurred.
+	 */
 	public synchronized static UUID login(String email, String password)
 			throws VocalServiceException {
 
+		// get the according user from the database
 		User user = UserManagement.getUserByEmail(email);
 
 		try {
 			boolean success = false;
+
 			if (null != user) {
 				byte[] userPwHash = convertFromBase64(user.getPwHash());
 				byte[] userPwSalt = convertFromBase64(user.getPwSalt());
+
 				success = PasswordEncryptionHelper.authenticate(password,
 						userPwHash, userPwSalt);
 			}
@@ -83,10 +135,23 @@ public class SessionManagement {
 		return sessionId;
 	}
 
+	/**
+	 * Handles the logout of a user by removing him from the sessions map.
+	 * 
+	 * @param sessionId
+	 *            The session id of the user to log out.
+	 */
 	public synchronized static void logout(UUID sessionId) {
 		sessions.remove(sessionId);
 	}
 
+	/**
+	 * Returns the according user to the given session id.
+	 * 
+	 * @param id
+	 *            The session id of the user to get
+	 * @return The user according to the given id
+	 */
 	public synchronized static User getUserBySessionId(long id) {
 		return sessions.get(id);
 	}

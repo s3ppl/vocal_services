@@ -4,15 +4,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-
-import org.apache.catalina.session.ManagerBase;
 
 import pi.vocal.user.Location;
 
@@ -21,9 +18,6 @@ public class LocationMockService {
 
 	@Context
 	private HttpServletResponse response;
-	
-	@Context
-	private HttpServletRequest request;
 	
 	@GET
 	@Path("/getLocations")
@@ -38,15 +32,5 @@ public class LocationMockService {
 		response.setCharacterEncoding("UTF-8");
 
 		return locList;
-	}
-	
-	@GET
-	@Path("/getRequest")
-	@Produces(MediaType.APPLICATION_JSON)
-	public String getRequest() throws UnsupportedEncodingException {
-		request.getSession().setAttribute("foo", "bar");
-		System.out.println(request.getSession().getId().length());
-			
-		return request.getSession().getId();
 	}
 }

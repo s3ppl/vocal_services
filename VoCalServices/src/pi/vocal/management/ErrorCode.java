@@ -2,6 +2,7 @@ package pi.vocal.management;
 
 public enum ErrorCode {
 
+	// account creation errors
 	PASSWORD_MISSING,
 	PASSWORD_TOO_SHORT,
 	PASSWORDS_DONT_MATCH,
@@ -12,7 +13,11 @@ public enum ErrorCode {
 	EMAIL_MISSING,
 	EMAIL_ALREADY_IN_USE,
 	EMAIL_INVALID,
+	
+	// misc
 	INTERNAL_ERROR,
+	
+	// login errors
 	AUTHENTICATION_FAILED;
 	
 //	private String displayText;
