@@ -1,4 +1,4 @@
-package pi.vocal.service;
+package pi.vocal.service.tests;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -14,7 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import pi.vocal.event.EventType;
-import pi.vocal.management.PasswordEncryptionHelper;
+import pi.vocal.management.helper.PasswordEncryptionHelper;
 import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;

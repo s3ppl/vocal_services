@@ -1,5 +1,6 @@
-package pi.vocal.service;
+package pi.vocal.service.tests;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,7 +10,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import pi.vocal.management.ErrorCode;
+import pi.vocal.management.SessionManagement;
+import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.persistence.dto.User;
+import pi.vocal.service.JsonResponse;
 import pi.vocal.service.dto.PublicUser;
 
 @Path("/TestService")
@@ -38,9 +43,29 @@ public class TestService {
  
 		JsonResponse<List<PublicUser>> response = new JsonResponse<>();
 		response.setContent(Arrays.asList(user));
-		response.setSuccess(1);
+		response.setSuccess(true);
 		
 		return response;
+	}
+	
+	@GET
+	@Path("/login")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JsonResponse<?> login(@QueryParam("email") String email, @QueryParam("password") String password) {
+		JsonResponse<String> response = new JsonResponse<>();
+		response.setSuccess(true);
+		
+		try {
+			response.setContent(SessionManagement.login(email, password));
+		} catch (VocalServiceException e) {
+			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
+			errorResponse.setSuccess(false);
+			errorResponse.setContent(e.getErrorCodes());
+			
+			return errorResponse;
+		}
+		
+		return response;		
 	}
 	
 	

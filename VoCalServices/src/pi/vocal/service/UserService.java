@@ -2,18 +2,20 @@ package pi.vocal.service;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.jboss.logging.Logger;
 
 import pi.vocal.management.ErrorCode;
 import pi.vocal.management.UserManagement;
-import pi.vocal.management.exception.AccountCreationException;
+import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.service.dto.PublicUser;
 import pi.vocal.user.Grade;
 import pi.vocal.user.Location;
@@ -38,31 +40,46 @@ public class UserService {
 		List<ErrorCode> errors = null;
 
 		JsonResponse<List<ErrorCode>> response = new JsonResponse<>();
-		response.setSuccess(1);
+		response.setSuccess(true);
 
-		System.out.println("DEBUG0");
-		
 		try {
 			UserManagement.createUser(firstName, lastName, email, grade,
 					location, password);
-		} catch (AccountCreationException e) {
-			LOGGER.error("Nested Exception", e.getCause());
-			
+		} catch (VocalServiceException e) {
+			if (null != e.getCause()) {
+				LOGGER.error("Nested Exception", e.getCause());
+			}
+
 			errors = e.getErrorCodes();
-			response.setSuccess(0);
+			response.setSuccess(false);
 		}
-		
+
 		response.setContent(errors);
 
 		return response;
 	}
 
 	@GET
-	// @POST
-	@Path("/getUserById")
+	@Path("/editUser")
 	@Produces(MediaType.APPLICATION_JSON)
-	public PublicUser getUserById(@QueryParam("id") long userId) {
-		return UserManagement.getUserById(userId);
+	public JsonResponse<List<ErrorCode>> editAccount() {		
+		return null;
 	}
+	
+//	@GET
+//	// @POST
+//	@Path("/getUserById")
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public PublicUser getUserById(@QueryParam("id") long userId) {
+//		return UserManagement.getUserById(userId);
+//	}
+//
+//	@GET
+//	// @POST
+//	@Path("/getUserByEmail")
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public PublicUser getUserByEmail(@QueryParam("email") String email) {
+//		return UserManagement.getUserByEmail(email);
+//	}
 
 }

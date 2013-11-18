@@ -1,9 +1,10 @@
-package pi.vocal.service;
+package pi.vocal.service.tests;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -19,6 +20,9 @@ public class LocationMockService {
 	@Context
 	private HttpServletResponse response;
 	
+	@Context
+	private HttpServletRequest request;
+	
 	@GET
 	@Path("/getLocations")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -32,5 +36,13 @@ public class LocationMockService {
 		response.setCharacterEncoding("UTF-8");
 
 		return locList;
+	}
+	
+	@GET
+	@Path("/getRequest")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getRequest() throws UnsupportedEncodingException {
+		request.getSession().setAttribute("foo", "bar");
+		return request.getSession().getId();
 	}
 }

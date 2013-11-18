@@ -3,6 +3,8 @@ package pi.vocal.service.dto;
 import java.util.List;
 
 import pi.vocal.event.EventType;
+import pi.vocal.persistence.dto.Event;
+import pi.vocal.persistence.dto.User;
 import pi.vocal.user.Grade;
 import pi.vocal.user.Location;
 import pi.vocal.user.Role;
@@ -19,6 +21,20 @@ public class PublicEvent {
 	private long eventId;
 	
 	private List<EventUser> attendants;
+
+	public PublicEvent(Event event) {
+		this.startDate = event.getStartDate();
+		this.endDate = event.getEndDate();
+		
+		this.title = event.getTitle();
+		this.description = event.getDescription();
+		
+		this.eventType = event.getEventType();
+		
+		this.eventId = event.getEventId();
+		
+		this.setAttendents(event.getAttendants());
+	}
 
 	public long getStartDate() {
 		return startDate;
@@ -73,16 +89,16 @@ public class PublicEvent {
 	}
 	
 	// TODO improve variable names - too confusing
-	public void setAttendents(List<PublicUser> attendants) {
+	public void setAttendents(List<User> attendants) {
 		EventUser attendant = null;
-		for (PublicUser publicUser : attendants) {
+		for (User user : attendants) {
 			attendant = new EventUser();
-			attendant.setEmail(publicUser.getEmail());
-			attendant.setFirstName(publicUser.getFirstName());
-			attendant.setGrade(publicUser.getGrade());
-			attendant.setLastName(publicUser.getLastName());
-			attendant.setRole(publicUser.getRole());
-			attendant.setSchoolLocation(publicUser.getSchoolLocation());
+			attendant.setEmail(user.getEmail());
+			attendant.setFirstName(user.getFirstName());
+			attendant.setGrade(user.getGrade());
+			attendant.setLastName(user.getLastName());
+			attendant.setRole(user.getRole());
+			attendant.setSchoolLocation(user.getSchoolLocation());
 			
 			this.attendants.add(attendant);
 		}

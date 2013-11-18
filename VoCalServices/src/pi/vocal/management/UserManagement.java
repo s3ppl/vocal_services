@@ -11,7 +11,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
-import pi.vocal.management.exception.AccountCreationException;
+import pi.vocal.management.exception.VocalServiceException;
+import pi.vocal.management.helper.PasswordEncryptionHelper;
 import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.service.dto.PublicUser;
@@ -21,15 +22,43 @@ import pi.vocal.user.Role;
 
 public class UserManagement {
 
+	/**
+	 * Minimum length a password must have
+	 */
 	private static final int MIN_PW_LEN = 6;
 
+	/**
+	 * Regular expression to match an email address
+	 */
 	private static final String EMAIL_MATCH_STRING = "^[0-9A-Za-z_\\-.]+@[0-9A-Za-z_\\-.]+\\.[0-9A-Za-z_\\-.]+$";
 
+	/**
+	 * Private constructor since all methods are static.
+	 */
+	private UserManagement() {
+	}
+
+	// TODO this description sucks
+	/**
+	 * Converts a given String to base64-encoding.
+	 * 
+	 * @param input
+	 *            The string to encode
+	 * @return A base64 representation of the given String
+	 */
 	private static String convertToBase64(byte[] input) {
 		return DatatypeConverter.printBase64Binary(input);
 	}
 
-	private static User getUserByEmail(String email) {
+	/**
+	 * Gets the user according to the given email address from the database.
+	 * 
+	 * @param email
+	 *            The email address of the user to get
+	 * @return The User object from the database according to the given mail
+	 *         address
+	 */
+	public static User getUserByEmail(String email) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
 		User user = (User) session.createCriteria(User.class)
@@ -40,6 +69,17 @@ public class UserManagement {
 		return user;
 	}
 
+	/**
+	 * Verifies the input the user made while creating an account. Checks for
+	 * empty or invalid inputs.
+	 * 
+	 * @param user
+	 *            The user object that holds the input to verify
+	 * @param password
+	 *            The password the user entered
+	 * @return A list of error codes that contains all errors that occurred. If
+	 *         all values are correct, the list will be empty.
+	 */
 	private static List<ErrorCode> verifyUserInput(User user, String password) {
 		List<ErrorCode> errorCodes = new ArrayList<>();
 
@@ -76,10 +116,31 @@ public class UserManagement {
 		return errorCodes;
 	}
 
+	/**
+	 * Creates a user object from the given input. Also adds password hash and
+	 * salt for database storing.
+	 * 
+	 * @param firstName
+	 *            The firstname the user entered
+	 * @param lastName
+	 *            The lastname of the user
+	 * @param email
+	 *            The email of the user
+	 * @param grade
+	 *            The grade of the user
+	 * @param schoolLocation
+	 *            The location of the school the user trains
+	 * @param password
+	 *            The password of the user
+	 * @return A user object containing the entered data of the user
+	 * @throws VocalServiceException
+	 *             Thrown if any value the user entered is invalid or an
+	 *             internal error occurred
+	 */
 	private static User createUserFromUserInput(String firstName,
 			String lastName, String email, Grade grade,
 			Location schoolLocation, String password)
-			throws AccountCreationException {
+			throws VocalServiceException {
 
 		User userDto = new User();
 		userDto.setFirstName(firstName);
@@ -91,21 +152,22 @@ public class UserManagement {
 
 		List<ErrorCode> errorCodes = verifyUserInput(userDto, password);
 
+		// if any value was invalid, throw an exception containing the errors
 		if (errorCodes.size() > 0) {
-			throw new AccountCreationException(errorCodes,
+			throw new VocalServiceException(errorCodes,
 					"Account creation failed due to invalid user input.");
 		}
 
-		byte[] pwSalt;
+		// create and set password hash and salt
 		try {
-			pwSalt = PasswordEncryptionHelper.generateSalt();
+			byte[] pwSalt = PasswordEncryptionHelper.generateSalt();
 			byte[] encryptedPw = PasswordEncryptionHelper.getEncryptedPassword(
 					password, pwSalt);
 
 			userDto.setPwHash(convertToBase64(encryptedPw));
 			userDto.setPwSalt(convertToBase64(pwSalt));
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-			throw new AccountCreationException(
+			throw new VocalServiceException(
 					ErrorCode.INTERNAL_ERROR,
 					"Could not create Account. Password hashing or salting failed. See nested Exception for further details.",
 					e);
@@ -114,9 +176,28 @@ public class UserManagement {
 		return userDto;
 	}
 
+	/**
+	 * Creates a new user in the database.
+	 * 
+	 * @param firstName
+	 *            The firstname the user entered
+	 * @param lastName
+	 *            The lastname of the user
+	 * @param email
+	 *            The email of the user
+	 * @param grade
+	 *            The grade of the user
+	 * @param schoolLocation
+	 *            The location of the school the user trains
+	 * @param password
+	 *            The password of the user
+	 * @throws VocalServiceException
+	 *             Thrown if the creation of the user fails due to invalid input
+	 *             or an internal error
+	 */
 	public static void createUser(String firstName, String lastName,
 			String email, Grade grade, Location schoolLocation, String password)
-			throws AccountCreationException {
+			throws VocalServiceException {
 
 		Session session = null;
 		try {
@@ -130,17 +211,30 @@ public class UserManagement {
 			session.getTransaction().commit();
 			session.close();
 		} catch (HibernateException he) {
-			if (null != session && session.isOpen()) {				
+			if (null != session && session.isOpen()) {
 				session.getTransaction().rollback();
 			}
-			
-			throw new AccountCreationException(
+
+			throw new VocalServiceException(
 					ErrorCode.INTERNAL_ERROR,
-					"Could not create Account. Storing in the database failed. See nested Exception for further details.",
+					"Could not create Account. Storing to the database failed. See nested Exception for further details.",
 					he);
 		}
 	}
 
+	public static void changePassword(String old, String new1, String new2) throws VocalServiceException {
+		if (!new1.equals(new2)) {
+			throw new VocalServiceException(ErrorCode.PASSWORDS_DONT_MATCH);
+		}
+	}
+	
+	/**
+	 * Find a user in the database using his database id.
+	 * 
+	 * @param id
+	 *            The id of the user to find
+	 * @return The PublicUser object of the user according to the given id
+	 */
 	public static PublicUser getUserById(long id) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
@@ -150,5 +244,17 @@ public class UserManagement {
 
 		return new PublicUser(user);
 	}
+
+	/**
+	 * Find a user in the database by his mail address
+	 * 
+	 * @param email
+	 *            The mail address of the user to find
+	 * @return The PublicUser object if the user according to the given mail
+	 *         address
+	 */
+//	public static PublicUser getUserByEmail(String email) {
+//		return new PublicUser(getUserDtoByEmail(email));
+//	}
 
 }
