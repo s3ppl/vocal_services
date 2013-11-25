@@ -68,6 +68,8 @@ public class UserService {
 		@FormParam("grade") Grade grade,
 		@FormParam("schoollocation") SchoolLocation location) {
 
+		// TODO change enum parameters to string for error checking server side
+		
 		List<ErrorCode> errors = null;
 
 		LOGGER.info("Firstname Parameter: " + firstName);
