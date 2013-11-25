@@ -11,8 +11,6 @@
 
 		<property name="hibernate.hbm2ddl.auto">create-drop</property>
 		<property name="hibernate.current_session_context_class">thread</property>
-		<!-- property name="hibernate.current_session_context_class">jta</property>
-		<property name="hibernate.transaction.jta.platform">org.jboss.as.jpa.hibernate3.JBossAppServerJtaPlatform</property-->
 
 		<property name="hibernate.show_sql">false</property>
 		<property name="hibernate.search.autoregister_listeners">false</property>
@@ -21,7 +19,7 @@
 		<mapping class="pi.vocal.persistence.dto.User" />
 		<mapping class="pi.vocal.persistence.dto.Event" />
 		<mapping class="pi.vocal.user.Grade" />
-		<mapping class="pi.vocal.user.Location" />
+		<mapping class="pi.vocal.user.SchoolLocation" />
 		<mapping class="pi.vocal.user.Role" />
 		<mapping class="pi.vocal.event.EventType" />
 	</session-factory>

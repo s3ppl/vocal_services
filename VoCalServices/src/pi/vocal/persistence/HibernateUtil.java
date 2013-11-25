@@ -8,8 +8,11 @@ import org.jboss.logging.Logger;
 
 public class HibernateUtil {
 	private static final Logger logger = Logger.getLogger(HibernateUtil.class);
-	
+
 	private static final SessionFactory sessionFactory = buildSessionFactory();
+
+	private HibernateUtil() {
+	}
 
 	private static SessionFactory buildSessionFactory() {
 		try {
@@ -17,7 +20,7 @@ public class HibernateUtil {
 			cfg.configure();
 			ServiceRegistry servReg = new ServiceRegistryBuilder()
 					.applySettings(cfg.getProperties()).buildServiceRegistry();
-			
+
 			return new Configuration().configure().buildSessionFactory(servReg);
 		} catch (Throwable ex) {
 			logger.error(ex);

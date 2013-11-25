@@ -2,7 +2,10 @@ package pi.vocal.service;
 
 import java.util.List;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -14,7 +17,9 @@ import pi.vocal.management.ErrorCode;
 import pi.vocal.management.UserManagement;
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.user.Grade;
-import pi.vocal.user.Location;
+import pi.vocal.user.SchoolLocation;
+
+// TODO change QueryParam to FormParam for POST-Requests!
 
 /**
  * 
@@ -43,20 +48,35 @@ public class UserService {
 	 * @return A list of {@code ErrorCode} which contains all errors, the users
 	 *         input has, like no password.
 	 */
-	@GET
-	// @POST
+//	@GET
+	@POST
 	@Path("/createUser")
 	@Produces(MediaType.APPLICATION_JSON)
+//	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public JsonResponse<List<ErrorCode>> createAccount(
-			@QueryParam("firstname") String firstName,
-			@QueryParam("lastname") String lastName,
-			@QueryParam("email") String email,
-			@QueryParam("password") String password,
-			@QueryParam("grade") Grade grade,
-			@QueryParam("location") Location location) {
+//			@QueryParam("firstname") String firstName,
+//			@QueryParam("lastname") String lastName,
+//			@QueryParam("email") String email,
+//			@QueryParam("password") String password,
+//			@QueryParam("grade") Grade grade,
+//			@QueryParam("schoollocation") Location location) {
+		
+		@FormParam("firstname") String firstName,
+		@FormParam("lastname") String lastName,
+		@FormParam("email") String email,
+		@FormParam("password") String password,
+		@FormParam("grade") Grade grade,
+		@FormParam("schoollocation") SchoolLocation location) {
 
 		List<ErrorCode> errors = null;
 
+		LOGGER.info("Firstname Parameter: " + firstName);
+		LOGGER.info("Lastname Parameter: " + lastName);
+		LOGGER.info("Email Parameter: " + email);
+		LOGGER.info("Password Parameter: " + password);
+		LOGGER.info("Grade Parameter: " + grade);
+		LOGGER.info("Location Parameter: " + location);
+		
 		JsonResponse<List<ErrorCode>> response = new JsonResponse<>();
 		response.setSuccess(true);
 
@@ -82,6 +102,7 @@ public class UserService {
 	}
 
 	@GET
+//	@POST
 	@Path("/editUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<List<ErrorCode>> editAccount() {
@@ -90,27 +111,12 @@ public class UserService {
 	}
 
 	@GET
+//	@POST
 	@Path("/deleteUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<List<ErrorCode>> deleteAccount() {
 		// TODO implement me!
 		return null;
 	}
-
-	// @GET
-	// // @POST
-	// @Path("/getUserById")
-	// @Produces(MediaType.APPLICATION_JSON)
-	// public PublicUser getUserById(@QueryParam("id") long userId) {
-	// return UserManagement.getUserById(userId);
-	// }
-	//
-	// @GET
-	// // @POST
-	// @Path("/getUserByEmail")
-	// @Produces(MediaType.APPLICATION_JSON)
-	// public PublicUser getUserByEmail(@QueryParam("email") String email) {
-	// return UserManagement.getUserByEmail(email);
-	// }
 
 }

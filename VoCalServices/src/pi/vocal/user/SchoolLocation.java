@@ -1,6 +1,6 @@
 package pi.vocal.user;
 
-public enum Location {
+public enum SchoolLocation {
 
 	STUTTGART("Stuttgart"),
 	MUEHLACKER("Mühlacker"),
@@ -8,7 +8,7 @@ public enum Location {
 	
 	private String name;
 	
-	private Location(String name) {
+	private SchoolLocation(String name) {
 		this.name = name;
 	}
 	

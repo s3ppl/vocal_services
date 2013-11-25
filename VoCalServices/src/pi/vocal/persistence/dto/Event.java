@@ -1,13 +1,16 @@
 package pi.vocal.persistence.dto;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import pi.vocal.event.EventType;
@@ -56,6 +59,9 @@ public class Event implements Serializable {
 	
 	@ManyToMany(mappedBy="events")
 	private List<User> attendants;
+	
+//	@OneToMany(mappedBy="event")
+//	private Set<UserAttendance> userAttendance = new HashSet<>();
 
 	public long getStartDate() {
 		return startDate;
@@ -108,6 +114,14 @@ public class Event implements Serializable {
 	public long getEventId() {
 		return eventId;
 	}
+//
+//	public Set<UserAttendance> getUserAttendance() {
+//		return userAttendance;
+//	}
+//
+//	public void setUserAttendance(Set<UserAttendance> userAttendance) {
+//		this.userAttendance = userAttendance;
+//	}
 	
 	
 }

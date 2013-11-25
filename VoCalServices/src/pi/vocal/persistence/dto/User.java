@@ -1,7 +1,9 @@
 package pi.vocal.persistence.dto;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,13 +14,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import pi.vocal.user.Grade;
-import pi.vocal.user.Location;
+import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
 
 @Entity
@@ -43,7 +46,7 @@ public class User implements Serializable {
 	private String email;
 	
 	@Column(nullable=false)
-	private Location schoolLocation;
+	private SchoolLocation schoolLocation;
 	
 	@Column(nullable=false)
 	private Grade grade;
@@ -63,11 +66,14 @@ public class User implements Serializable {
 			inverseJoinColumns={@JoinColumn(name="eventId")})
 	private List<Event> events;
 	
-	public Location getSchoolLocation() {
+//	@OneToMany(mappedBy="user")
+//	private Set<UserAttendance> userAttendance = new HashSet<>();
+	
+	public SchoolLocation getSchoolLocation() {
 		return schoolLocation;
 	}
 	
-	public void setSchoolLocation(Location schoolLocation) {
+	public void setSchoolLocation(SchoolLocation schoolLocation) {
 		this.schoolLocation = schoolLocation;
 	}
 	
@@ -126,6 +132,16 @@ public class User implements Serializable {
 	public void setRole(Role role) {
 		this.role = role;
 	}
+
+//	public Set<UserAttendance> getUserAttendance() {
+//		return userAttendance;
+//	}
+//
+//	public void setUserAttendance(Set<UserAttendance> userAttendance) {
+//		this.userAttendance = userAttendance;
+//	}
+	
+	
 
 	public List<Event> getEvents() {
 		return events;

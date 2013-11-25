@@ -11,7 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import pi.vocal.user.Location;
+import pi.vocal.user.SchoolLocation;
 
 @Path("/MockService")
 public class LocationMockService {
@@ -22,10 +22,10 @@ public class LocationMockService {
 	@GET
 	@Path("/getLocations")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<Location, String> getLocations() throws UnsupportedEncodingException {
-		Map<Location, String> locList = new HashMap<Location, String>();
+	public Map<SchoolLocation, String> getLocations() throws UnsupportedEncodingException {
+		Map<SchoolLocation, String> locList = new HashMap<SchoolLocation, String>();
 
-		for (Location l : Location.values()) {
+		for (SchoolLocation l : SchoolLocation.values()) {
 			locList.put(l, l.getName());
 		}
 		

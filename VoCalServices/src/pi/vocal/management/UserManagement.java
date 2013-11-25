@@ -17,7 +17,7 @@ import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.service.dto.PublicUser;
 import pi.vocal.user.Grade;
-import pi.vocal.user.Location;
+import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
 
 public class UserManagement {
@@ -104,7 +104,7 @@ public class UserManagement {
 		}
 
 		if (null == user.getSchoolLocation()) {
-			errorCodes.add(ErrorCode.SCHOOL_MISSING);
+			errorCodes.add(ErrorCode.SCHOOL_LOCATION_MISSING);
 		}
 
 		if (null == password || password.isEmpty()) {
@@ -139,7 +139,7 @@ public class UserManagement {
 	 */
 	private static User createUserFromUserInput(String firstName,
 			String lastName, String email, Grade grade,
-			Location schoolLocation, String password)
+			SchoolLocation schoolLocation, String password)
 			throws VocalServiceException {
 
 		User userDto = new User();
@@ -196,7 +196,7 @@ public class UserManagement {
 	 *             or an internal error
 	 */
 	public static void createUser(String firstName, String lastName,
-			String email, Grade grade, Location schoolLocation, String password)
+			String email, Grade grade, SchoolLocation schoolLocation, String password)
 			throws VocalServiceException {
 
 		Session session = null;

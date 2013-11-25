@@ -19,7 +19,7 @@ import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.user.Grade;
-import pi.vocal.user.Location;
+import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
 
 @Path("/dbservice")
@@ -39,11 +39,11 @@ public class HibernateMockservice {
 
 		User user1 = new User();
 		user1.setEmail("my@mail.com");
-		user1.setSchoolLocation(Location.STUTTGART);
+		user1.setSchoolLocation(SchoolLocation.STUTTGART);
 		user1.setFirstName("foo");
 		user1.setLastName("bar");
 		user1.setGrade(Grade.DISCIPLE);
-		user1.setSchoolLocation(Location.MUEHLACKER);
+		user1.setSchoolLocation(SchoolLocation.MUEHLACKER);
 		user1.setRole(Role.USER);
 
 		try {

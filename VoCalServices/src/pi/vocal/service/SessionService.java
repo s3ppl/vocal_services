@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -20,6 +21,7 @@ public class SessionService {
 	private static final Logger LOGGER = Logger.getLogger(SessionService.class);
 
 	@GET
+//	@POST
 	@Path("/login")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<?> login(@QueryParam("email") String email,
@@ -50,6 +52,7 @@ public class SessionService {
 	}
 
 	@GET
+//	@POST
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<ErrorCode> logout(@QueryParam("id") String id) {

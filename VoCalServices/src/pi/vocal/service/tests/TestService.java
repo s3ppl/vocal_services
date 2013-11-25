@@ -1,6 +1,7 @@
 package pi.vocal.service.tests;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,6 +59,21 @@ public class TestService {
 		System.out.println(request.getSession().getId().length());
 			
 		return request.getSession().getId();
+	}
+	
+	@GET
+	@Path("/testRequest")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JsonResponse<List<Object>> testRequest() {
+		List<Object> myList = new ArrayList<>();
+		myList.add(new User());
+		myList.add("foo");
+		
+		JsonResponse<List<Object>> response = new JsonResponse<>();
+		response.setContent(myList);
+		response.setSuccess(true);
+		
+		return response;
 	}
 	
 }

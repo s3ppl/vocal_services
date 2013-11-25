@@ -7,7 +7,7 @@ import pi.vocal.event.EventType;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.user.Grade;
-import pi.vocal.user.Location;
+import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
 
 /**
@@ -28,7 +28,7 @@ public class PublicUser {
 	private String lastName;
 	private String email;
 
-	private Location schoolLocation;
+	private SchoolLocation schoolLocation;
 	private Grade grade;
 
 	private Role role;
@@ -83,11 +83,11 @@ public class PublicUser {
 		this.email = email;
 	}
 
-	public Location getSchoolLocation() {
+	public SchoolLocation getSchoolLocation() {
 		return schoolLocation;
 	}
 
-	public void setSchoolLocation(Location schoolLocation) {
+	public void setSchoolLocation(SchoolLocation schoolLocation) {
 		this.schoolLocation = schoolLocation;
 	}
 
