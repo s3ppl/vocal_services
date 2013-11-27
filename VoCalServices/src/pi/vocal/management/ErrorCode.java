@@ -13,20 +13,18 @@ public enum ErrorCode {
 	EMAIL_MISSING,
 	EMAIL_ALREADY_IN_USE,
 	EMAIL_INVALID,
+	SESSION_INVALID,
+	
+	// event creation errors
+	TITLE_MISSING,
+	STARTDATE_MISSING,
+	ENDDATE_MISSING,
+	EVENT_TYPE_MISSING,
+	STARTDATE_AFTER_ENDDATE,
 	
 	// misc
 	INTERNAL_ERROR,
 	
 	// login errors
 	AUTHENTICATION_FAILED;
-	
-//	private String displayText;
-//	
-//	public ErrorCode(String displayText) {
-//		this.displayText = displayText;
-//	}
-//	
-//	public String getDisplayText() {
-//		return displayText;
-//	}
 }

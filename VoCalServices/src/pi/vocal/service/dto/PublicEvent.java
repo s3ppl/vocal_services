@@ -21,6 +21,8 @@ public class PublicEvent {
 	private long eventId;
 	
 	private List<EventUser> attendants;
+	
+	public PublicEvent() {}
 
 	public PublicEvent(Event event) {
 		this.startDate = event.getStartDate();

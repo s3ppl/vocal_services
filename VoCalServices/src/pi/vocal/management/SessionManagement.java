@@ -2,6 +2,7 @@ package pi.vocal.management;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,7 +69,7 @@ public class SessionManagement {
 					LOGGER.info("User was already logged in. Remove session id: " + id.toString());
 				}
 				
-				sessions.remove(email);
+				sessions.remove(id);
 			}
 		}
 	}
@@ -126,7 +127,7 @@ public class SessionManagement {
 	 *             Thrown if either the authentication of the user failed or an
 	 *             internal error occurred.
 	 */
-	public synchronized static UUID login(String email, String password)
+	public synchronized static Map<String, Object> login(String email, String password)
 			throws VocalServiceException {
 
 		// make sure the user won't get logged in twice
@@ -134,6 +135,7 @@ public class SessionManagement {
 		
 		// get the according user from the database
 		User user = UserManagement.getUserByEmail(email);
+		Map<String, Object> result = new HashMap<String, Object>();
 
 		try {
 			boolean success = false;
@@ -158,7 +160,10 @@ public class SessionManagement {
 		UUID sessionId = generateSessionId();
 		sessions.put(sessionId, user);
 
-		return sessionId;
+		result.put("user", user);
+		result.put("sessionId",	sessionId);
+		
+		return result;
 	}
 
 	/**
@@ -178,7 +183,7 @@ public class SessionManagement {
 	 *            The session id of the user to get
 	 * @return The user according to the given id
 	 */
-	public synchronized static User getUserBySessionId(long id) {
+	public synchronized static User getUserBySessionId(UUID id) {
 		return sessions.get(id);
 	}
 }

@@ -3,8 +3,11 @@ package pi.vocal.management;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
+import javax.ws.rs.FormParam;
 import javax.xml.bind.DatatypeConverter;
 
 import org.hibernate.HibernateException;
@@ -21,6 +24,8 @@ import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
 
 public class UserManagement {
+
+	// TODO add logging
 	
 	/**
 	 * Minimum length a password must have
@@ -99,11 +104,13 @@ public class UserManagement {
 			errorCodes.add(ErrorCode.EMAIL_ALREADY_IN_USE);
 		}
 
-		if (null == user.getGrade()) {
+		if (null == user.getGrade() || user.getGrade() == Grade.NOT_SELECTED) {
 			errorCodes.add(ErrorCode.GRADE_MISSING);
 		}
 
-		if (null == user.getSchoolLocation()) {
+		if (null == user.getSchoolLocation()
+				|| user.getSchoolLocation() == SchoolLocation.NOT_SELECTED) {
+
 			errorCodes.add(ErrorCode.SCHOOL_LOCATION_MISSING);
 		}
 
@@ -153,7 +160,7 @@ public class UserManagement {
 		List<ErrorCode> errorCodes = verifyUserInput(userDto, password);
 
 		// if any value was invalid, throw an exception containing the errors
-		if (errorCodes.size() > 0) {
+		if (null != errorCodes && errorCodes.size() > 0) {
 			throw new VocalServiceException(errorCodes,
 					"Account creation failed due to invalid user input.");
 		}
@@ -196,8 +203,8 @@ public class UserManagement {
 	 *             or an internal error
 	 */
 	public static void createUser(String firstName, String lastName,
-			String email, Grade grade, SchoolLocation schoolLocation, String password)
-			throws VocalServiceException {
+			String email, Grade grade, SchoolLocation schoolLocation,
+			String password) throws VocalServiceException {
 
 		Session session = null;
 		try {
@@ -222,12 +229,14 @@ public class UserManagement {
 		}
 	}
 
-	public static void changePassword(String old, String new1, String new2) throws VocalServiceException {
+	public static void changePassword(String old, String new1, String new2)
+			throws VocalServiceException {
+
 		if (!new1.equals(new2)) {
 			throw new VocalServiceException(ErrorCode.PASSWORDS_DONT_MATCH);
 		}
 	}
-	
+
 	/**
 	 * Find a user in the database using his database id.
 	 * 
@@ -245,16 +254,38 @@ public class UserManagement {
 		return new PublicUser(user);
 	}
 
-	/**
-	 * Find a user in the database by his mail address
-	 * 
-	 * @param email
-	 *            The mail address of the user to find
-	 * @return The PublicUser object if the user according to the given mail
-	 *         address
-	 */
-//	public static PublicUser getUserByEmail(String email) {
-//		return new PublicUser(getUserDtoByEmail(email));
-//	}
+	public static List<SuccessCode> editUser(UUID sessionId, String firstName,
+			String lastName, SchoolLocation location) throws VocalServiceException {
+
+		List<SuccessCode> result = new ArrayList<>();
+		User user = SessionManagement.getUserBySessionId(sessionId);
+		
+		if (null != user) {
+			if (null != firstName && !user.getFirstName().equals(firstName)) {
+				user.setFirstName(firstName);
+				result.add(SuccessCode.FIRSTNAME_CHANGED);
+			}
+			
+			if (null != lastName && !user.getLastName().equals(lastName)) {
+				user.setLastName(lastName);
+				result.add(SuccessCode.LASTNAME_CHANGED);
+			}
+			
+			if (null != location && !(user.getSchoolLocation() == location)) {
+				user.setSchoolLocation(location);
+				result.add(SuccessCode.SCHOOL_LOCATION_CHANGED);
+			}
+			
+			Session session = HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction();
+			session.update(user);
+			session.getTransaction().commit();
+			session.close();
+		} else {
+			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
+		}
+
+		return result;
+	}
 
 }

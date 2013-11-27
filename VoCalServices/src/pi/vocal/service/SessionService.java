@@ -1,8 +1,10 @@
 package pi.vocal.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -18,27 +20,35 @@ import pi.vocal.management.exception.VocalServiceException;
 
 @Path("/SessionMgmt")
 public class SessionService {
-	private static final Logger LOGGER = Logger.getLogger(SessionService.class);
-
-	@GET
-//	@POST
+	private static final Logger log = Logger.getLogger(SessionService.class);
+	
+	// TODO return session id and user!!! (see TestService)
+//	@GET
+	@POST
 	@Path("/login")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<?> login(@QueryParam("email") String email,
-			@QueryParam("password") String password) {
-		JsonResponse<String> response = new JsonResponse<>();
+	public JsonResponse<?> login(
+//			@QueryParam("email") String email,
+//			@QueryParam("password") String password) {
+			
+		@FormParam("email") String email,
+		@FormParam("password") String password) {
+		
+		log.debug("email: " + email);
+		log.debug("password: " + password);
+		
+		JsonResponse<Map<String, Object>> response = new JsonResponse<>();
 		response.setSuccess(true);
 
 		try {
-			response.setContent(SessionManagement.login(email, password)
-					.toString());
+			response.setContent(SessionManagement.login(email, password));
 		} catch (VocalServiceException e) {
 			if (e.getErrorCodes().size() == 1
 					&& e.getErrorCodes().get(0) == ErrorCode.INTERNAL_ERROR) {
 				
-				LOGGER.error(
-						"Login failed. See nested exceptions for further detail.",
-						e);
+				log.error(
+						"Login failed. See nested exceptions for further detail." + 
+						e.getStackTrace());
 			}
 
 			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
@@ -51,11 +61,14 @@ public class SessionService {
 		return response;
 	}
 
-	@GET
-//	@POST
+//	@GET
+	@POST
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<ErrorCode> logout(@QueryParam("id") String id) {
+	public JsonResponse<ErrorCode> logout(
+//			@QueryParam("id") String id) {
+			@FormParam("sessionId") String id) {
+		
 		JsonResponse<ErrorCode> response = new JsonResponse<>();
 		response.setSuccess(true);
 
@@ -63,7 +76,7 @@ public class SessionService {
 			UUID sessionId = UUID.fromString(id);
 			SessionManagement.logout(sessionId);
 		} catch (IllegalArgumentException e) {
-			LOGGER.error(
+			log.error(
 					"The given session id had an invalid format. See nested exceptions for further details",
 					e);
 
