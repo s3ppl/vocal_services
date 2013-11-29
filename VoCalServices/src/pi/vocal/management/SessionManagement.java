@@ -22,7 +22,8 @@ import pi.vocal.persistence.dto.User;
  * 
  */
 public class SessionManagement {
-	private final static Logger LOGGER = Logger.getLogger(SessionManagement.class);
+	private final static Logger LOGGER = Logger
+			.getLogger(SessionManagement.class);
 
 	/**
 	 * Maximum amount of tries to create a unique session id
@@ -66,9 +67,10 @@ public class SessionManagement {
 		for (UUID id : sessions.keySet()) {
 			if (sessions.get(id).getEmail().equals(email)) {
 				if (LOGGER.isInfoEnabled()) {
-					LOGGER.info("User was already logged in. Remove session id: " + id.toString());
+					LOGGER.info("User was already logged in. Remove session id: "
+							+ id.toString());
 				}
-				
+
 				sessions.remove(id);
 			}
 		}
@@ -127,12 +129,12 @@ public class SessionManagement {
 	 *             Thrown if either the authentication of the user failed or an
 	 *             internal error occurred.
 	 */
-	public synchronized static Map<String, Object> login(String email, String password)
-			throws VocalServiceException {
+	public synchronized static Map<String, Object> login(String email,
+			String password) throws VocalServiceException {
 
 		// make sure the user won't get logged in twice
 		removeAlreadyLoggedInUser(email);
-		
+
 		// get the according user from the database
 		User user = UserManagement.getUserByEmail(email);
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -161,8 +163,8 @@ public class SessionManagement {
 		sessions.put(sessionId, user);
 
 		result.put("user", user);
-		result.put("sessionId",	sessionId);
-		
+		result.put("sessionId", sessionId);
+
 		return result;
 	}
 
@@ -173,7 +175,9 @@ public class SessionManagement {
 	 *            The session id of the user to log out.
 	 */
 	public synchronized static void logout(UUID sessionId) {
-		sessions.remove(sessionId);
+		if (null != sessionId) {
+			sessions.remove(sessionId);
+		}
 	}
 
 	/**
@@ -181,13 +185,14 @@ public class SessionManagement {
 	 * 
 	 * @param id
 	 *            The session id of the user to get
-	 * @return The user according to the given id or null if no user exists or the given id was null
+	 * @return The user according to the given id or null if no user exists or
+	 *         the given id was null
 	 */
 	public synchronized static User getUserBySessionId(UUID id) {
 		if (null == id) {
 			return null;
 		}
-		
+
 		return sessions.get(id);
 	}
 }
