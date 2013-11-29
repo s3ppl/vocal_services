@@ -181,9 +181,13 @@ public class SessionManagement {
 	 * 
 	 * @param id
 	 *            The session id of the user to get
-	 * @return The user according to the given id
+	 * @return The user according to the given id or null if no user exists or the given id was null
 	 */
 	public synchronized static User getUserBySessionId(UUID id) {
+		if (null == id) {
+			return null;
+		}
+		
 		return sessions.get(id);
 	}
 }

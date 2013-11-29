@@ -271,7 +271,7 @@ public class UserManagement {
 				result.add(SuccessCode.LASTNAME_CHANGED);
 			}
 			
-			if (null != location && !(user.getSchoolLocation() == location)) {
+			if (null != location && user.getSchoolLocation() != location) {
 				user.setSchoolLocation(location);
 				result.add(SuccessCode.SCHOOL_LOCATION_CHANGED);
 			}
