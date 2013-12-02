@@ -2,32 +2,31 @@ package pi.vocal.persistence.dto;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
 import pi.vocal.user.Grade;
-import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
+import pi.vocal.user.SchoolLocation;
+
+/**
+ * JavaBean like class, that will be used by Hibernate to store users.
+ * 
+ * NOTE: Table name has to be manually added, since the used MySql database has issues with capitals.
+ *  
+ * @author s3ppl
+ *
+ */
 
 @Entity
-// table name needed to avoid case sensitivity errors in mysql DB
 @Table(name = "user", uniqueConstraints = { @UniqueConstraint(columnNames = "email") })
-@JsonIgnoreProperties({"pwHash", "pwSalt"})
 public class User implements Serializable {
 
 	private static final long serialVersionUID = 6684430286499464672L;
@@ -60,14 +59,8 @@ public class User implements Serializable {
 	@Column(nullable=false)
 	private Role role;
 	
-	@ManyToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-	@JoinTable(name="event_attendance",
-			joinColumns={@JoinColumn(name="userId")},
-			inverseJoinColumns={@JoinColumn(name="eventId")})
-	private List<Event> events;
-	
-//	@OneToMany(mappedBy="user")
-//	private Set<UserAttendance> userAttendance = new HashSet<>();
+	@OneToMany(mappedBy="user")
+	private Set<UserAttendance> userAttendances = new HashSet<>();
 	
 	public SchoolLocation getSchoolLocation() {
 		return schoolLocation;
@@ -133,22 +126,16 @@ public class User implements Serializable {
 		this.role = role;
 	}
 
-//	public Set<UserAttendance> getUserAttendance() {
-//		return userAttendance;
-//	}
-//
-//	public void setUserAttendance(Set<UserAttendance> userAttendance) {
-//		this.userAttendance = userAttendance;
-//	}
-	
-	
-
-	public List<Event> getEvents() {
-		return events;
+	public Set<UserAttendance> getUserAttendance() {
+		return userAttendances;
 	}
 
-	public void setEvents(List<Event> events) {
-		this.events = events;
+	public void setUserAttendance(Set<UserAttendance> userAttendances) {
+		this.userAttendances = userAttendances;
+	}
+	
+	public void addUserAttendance(UserAttendance userAttendance) {
+		this.userAttendances.add(userAttendance);
 	}
 	
 }

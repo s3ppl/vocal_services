@@ -1,8 +1,10 @@
 package pi.vocal.user;
 
 public enum Grade {
+	
+	// real grades
 	CHILD, DISCIPLE, TRAINER, MASTER, 
 	
-	// TODO remove after added error handling
+	// value of no other grade was selected
 	NOT_SELECTED;
 }

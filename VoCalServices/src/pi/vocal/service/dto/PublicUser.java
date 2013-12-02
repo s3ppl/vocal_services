@@ -2,10 +2,12 @@ package pi.vocal.service.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import pi.vocal.event.EventType;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
+import pi.vocal.persistence.dto.UserAttendance;
 import pi.vocal.user.Grade;
 import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
@@ -56,7 +58,7 @@ public class PublicUser {
 		this.grade = user.getGrade();
 		this.role = user.getRole();
 
-		setEvents(user.getEvents());
+		setEvents(user.getUserAttendance());
 	}
 
 	public String getFirstName() {
@@ -115,12 +117,16 @@ public class PublicUser {
 	 * Converts all persistent events to a custom event. Afterwards those custom
 	 * events will be stored in this {@code PublicUser} object.
 	 * 
-	 * @param events
-	 *            The events of the user to publish
+	 * @param attendedEvents
+	 *            The events the user to publish attends
 	 */
-	public void setEvents(List<Event> events) {
+	public void setEvents(Set<UserAttendance> attendedEvents) {
 		UserEvent userEvent = null;
-		for (Event event : events) {
+		Event event = null;
+		
+		for (UserAttendance ua : attendedEvents) {
+			event = ua.getEvent();
+			
 			userEvent = new UserEvent();
 			userEvent.setDescription(event.getDescription());
 			userEvent.setEndDate(event.getEndDate());

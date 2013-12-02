@@ -18,9 +18,6 @@
 
 		<mapping class="pi.vocal.persistence.dto.User" />
 		<mapping class="pi.vocal.persistence.dto.Event" />
-		<mapping class="pi.vocal.user.Grade" />
-		<mapping class="pi.vocal.user.SchoolLocation" />
-		<mapping class="pi.vocal.user.Role" />
-		<mapping class="pi.vocal.event.EventType" />
+		<mapping class="pi.vocal.persistence.dto.UserAttendance" />
 	</session-factory>
 </hibernate-configuration>

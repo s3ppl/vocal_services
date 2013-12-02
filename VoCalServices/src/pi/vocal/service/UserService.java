@@ -1,6 +1,7 @@
 package pi.vocal.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
@@ -32,7 +33,7 @@ import pi.vocal.user.SchoolLocation;
 public class UserService {
 	private static final Logger LOGGER = Logger.getLogger(UserService.class);
 
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 
 	/**
 	 * This webservice creates a new user account with the given information.
@@ -75,12 +76,12 @@ public class UserService {
 		List<ErrorCode> errors = null;
 
 		if (DEBUG) {
-			LOGGER.info("Firstname Parameter: " + firstName);
-			LOGGER.info("Lastname Parameter: " + lastName);
-			LOGGER.info("Email Parameter: " + email);
-			LOGGER.info("Password Parameter: " + password);
-			LOGGER.info("Grade Parameter: " + grade);
-			LOGGER.info("Location Parameter: " + location);
+			LOGGER.debug("Firstname Parameter: " + firstName);
+			LOGGER.debug("Lastname Parameter: " + lastName);
+			LOGGER.debug("Email Parameter: " + email);
+			LOGGER.debug("Password Parameter: " + password);
+			LOGGER.debug("Grade Parameter: " + grade);
+			LOGGER.debug("Location Parameter: " + location);
 		}
 
 		JsonResponse<List<ErrorCode>> response = new JsonResponse<>();
@@ -111,26 +112,29 @@ public class UserService {
 	@POST
 	@Path("/editUser")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<List<?>> editAccount(
+	public JsonResponse<?> editAccount(
 			@FormParam("sessionId") UUID sessionId,
 			@FormParam("firstname") String firstName,
 			@FormParam("lastname") String lastName,
 			@FormParam("password") String password,
 			@FormParam("schoollocation") SchoolLocation location) {
-
-		JsonResponse<List<?>> response = new JsonResponse<>();
-		List<SuccessCode> result = null;
-		
+	
 		try {
+			JsonResponse<Map<String, Object>> response = new JsonResponse<>();
+			Map<String, Object> result = null;
+			
 			result = UserManagement.editUser(sessionId, firstName, lastName, location);
 			response.setSuccess(true);
 			response.setContent(result);
-		} catch (VocalServiceException e) {
-			response.setSuccess(false);
-			response.setContent(e.getErrorCodes());
+			
+			return response;
+		} catch (VocalServiceException e) {			
+			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
+			errorResponse.setSuccess(false);
+			errorResponse.setContent(e.getErrorCodes());
+			
+			return errorResponse;
 		}
-		
-		return response;
 	}
 
 	@GET

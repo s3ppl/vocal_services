@@ -22,7 +22,7 @@ import pi.vocal.persistence.dto.User;
  * 
  */
 public class SessionManagement {
-	private final static Logger LOGGER = Logger
+	private final static Logger logger = Logger
 			.getLogger(SessionManagement.class);
 
 	/**
@@ -66,10 +66,8 @@ public class SessionManagement {
 	private static void removeAlreadyLoggedInUser(String email) {
 		for (UUID id : sessions.keySet()) {
 			if (sessions.get(id).getEmail().equals(email)) {
-				if (LOGGER.isInfoEnabled()) {
-					LOGGER.info("User was already logged in. Remove session id: "
-							+ id.toString());
-				}
+				logger.warn("User was already logged in. Remove session id: "
+						+ id.toString());
 
 				sessions.remove(id);
 			}
@@ -124,7 +122,8 @@ public class SessionManagement {
 	 *            The email address of the user
 	 * @param password
 	 *            The password of the user
-	 * @return A new session id, that will be used after the login
+	 * @return A map containing a newly created session id and user according to
+	 *         the given mail address
 	 * @throws VocalServiceException
 	 *             Thrown if either the authentication of the user failed or an
 	 *             internal error occurred.
@@ -154,7 +153,7 @@ public class SessionManagement {
 				throw new VocalServiceException(ErrorCode.AUTHENTICATION_FAILED);
 			}
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-			LOGGER.error("Password encryption failed.", e);
+			logger.error("Password encryption failed.", e);
 			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, e);
 		}
 

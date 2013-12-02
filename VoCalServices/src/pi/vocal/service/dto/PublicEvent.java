@@ -1,10 +1,12 @@
 package pi.vocal.service.dto;
 
 import java.util.List;
+import java.util.Set;
 
 import pi.vocal.event.EventType;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
+import pi.vocal.persistence.dto.UserAttendance;
 import pi.vocal.user.Grade;
 import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
@@ -35,7 +37,7 @@ public class PublicEvent {
 		
 		this.eventId = event.getEventId();
 		
-		this.setAttendents(event.getAttendants());
+		this.setAttendents(event.getUserAttendance());
 	}
 
 	public long getStartDate() {
@@ -90,10 +92,12 @@ public class PublicEvent {
 		return attendants;
 	}
 	
-	// TODO improve variable names - too confusing
-	public void setAttendents(List<User> attendants) {
+	public void setAttendents(Set<UserAttendance> userAttendances) {
 		EventUser attendant = null;
-		for (User user : attendants) {
+		User user = null;
+		for (UserAttendance userAttendance : userAttendances) {
+			user = userAttendance.getUser();
+			
 			attendant = new EventUser();
 			attendant.setEmail(user.getEmail());
 			attendant.setFirstName(user.getFirstName());

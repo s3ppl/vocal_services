@@ -4,7 +4,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.FormParam;
@@ -26,7 +28,7 @@ import pi.vocal.user.Role;
 public class UserManagement {
 
 	// TODO add logging
-	
+
 	/**
 	 * Minimum length a password must have
 	 */
@@ -254,33 +256,57 @@ public class UserManagement {
 		return new PublicUser(user);
 	}
 
-	public static List<SuccessCode> editUser(UUID sessionId, String firstName,
-			String lastName, SchoolLocation location) throws VocalServiceException {
+	/**
+	 * Changes an existing User in the database.
+	 * 
+	 * @param sessionId
+	 *            The session id of the user, that wants to change his
+	 *            attributes
+	 * @param firstName
+	 *            The new firstname of the user. May be null
+	 * @param lastName
+	 *            The new lastname of the user. May be null
+	 * @param location
+	 *            The new location of the user. May be null
+	 * @return Returns either a map with the updated user object and a list of
+	 *         {@code SuccessCode}s
+	 * @throws VocalServiceException
+	 *             Thrown if the user with the given session id could not be
+	 *             found
+	 */
+	public static Map<String, Object> editUser(UUID sessionId,
+			String firstName, String lastName, SchoolLocation location)
+			throws VocalServiceException {
 
-		List<SuccessCode> result = new ArrayList<>();
+		Map<String, Object> result = new HashMap<String, Object>();
+		List<SuccessCode> successCodes = new ArrayList<>();
+
 		User user = SessionManagement.getUserBySessionId(sessionId);
-		
+
 		if (null != user) {
 			if (null != firstName && !user.getFirstName().equals(firstName)) {
 				user.setFirstName(firstName);
-				result.add(SuccessCode.FIRSTNAME_CHANGED);
+				successCodes.add(SuccessCode.FIRSTNAME_CHANGED);
 			}
-			
+
 			if (null != lastName && !user.getLastName().equals(lastName)) {
 				user.setLastName(lastName);
-				result.add(SuccessCode.LASTNAME_CHANGED);
+				successCodes.add(SuccessCode.LASTNAME_CHANGED);
 			}
-			
+
 			if (null != location && user.getSchoolLocation() != location) {
 				user.setSchoolLocation(location);
-				result.add(SuccessCode.SCHOOL_LOCATION_CHANGED);
+				successCodes.add(SuccessCode.SCHOOL_LOCATION_CHANGED);
 			}
-			
+
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			session.beginTransaction();
 			session.update(user);
 			session.getTransaction().commit();
 			session.close();
+
+			result.put("successcodes", successCodes);
+			result.put("user", user);
 		} else {
 			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
 		}

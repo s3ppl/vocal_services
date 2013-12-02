@@ -6,17 +6,18 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import pi.vocal.event.EventType;
+import pi.vocal.user.Grade;
 
 /**
- * JavaBean like class, that will be used by Hibernate to store users.
+ * JavaBean like class, that will be used by Hibernate to store events.
  * 
  * NOTE: Table name has to be manually added, since the used MySql database has issues with capitals.
  *  
@@ -34,13 +35,13 @@ public class Event implements Serializable {
 	 * The date the event starts in its unix-time representation
 	 */
 	@Column(nullable=false)
-	private long startDate;
+	private Long startDate;
 
 	/**
 	 * The date the event ends in its unix-time representation
 	 */
 	@Column(nullable=false)
-	private long endDate;
+	private Long endDate;
 
 	@Column(nullable=false)
 	private String title;
@@ -57,34 +58,29 @@ public class Event implements Serializable {
 	@GeneratedValue
 	private long eventId;
 	
-	@ManyToMany(mappedBy="events")
-	private List<User> attendants;
-	
-//	@OneToMany(mappedBy="event")
-//	private Set<UserAttendance> userAttendance = new HashSet<>();
+	@OneToMany(mappedBy="event")
+	private Set<UserAttendance> userAttendances = new HashSet<>();
 
-	public long getStartDate() {
+	
+	// TODO sub table creation fails.... 
+	@Column(nullable=false)
+	@ElementCollection(targetClass=Grade.class)
+	private Set<Grade> attendantsGrades = new HashSet<>();
+
+	public Long getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(long startDate) {
+	public void setStartDate(Long startDate) {
 		this.startDate = startDate;
 	}
 
-	public long getEndDate() {
+	public Long getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(long endDate) {
+	public void setEndDate(Long endDate) {
 		this.endDate = endDate;
-	}
-
-	public List<User> getAttendants() {
-		return attendants;
-	}
-
-	public void setAttendants(List<User> attendants) {
-		this.attendants = attendants;
 	}
 
 	public String getTitle() {
@@ -114,14 +110,28 @@ public class Event implements Serializable {
 	public long getEventId() {
 		return eventId;
 	}
-//
-//	public Set<UserAttendance> getUserAttendance() {
-//		return userAttendance;
-//	}
-//
-//	public void setUserAttendance(Set<UserAttendance> userAttendance) {
-//		this.userAttendance = userAttendance;
-//	}
+
+	public Set<UserAttendance> getUserAttendance() {
+		return userAttendances;
+	}
+
+	public void setUserAttendance(Set<UserAttendance> userAttendances) {
+		this.userAttendances = userAttendances;
+	}
+
+	public Set<Grade> getAttendantsGrades() {
+		return attendantsGrades;
+	}
+
+	public void setAttendantsGrades(Set<Grade> attendantsGrades) {
+		this.attendantsGrades = attendantsGrades;
+	}
 	
+	public void addAttendantGrade(Grade grade) {
+		this.attendantsGrades.add(grade);
+	}
 	
+	public void addUserAttendance(UserAttendance userAttendancen) {
+		this.userAttendances.add(userAttendancen);
+	}
 }

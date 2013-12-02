@@ -62,8 +62,8 @@ public class HibernateMockservice {
 		event1.setStartDate(System.currentTimeMillis());
 		event1.setEndDate(System.currentTimeMillis() + 1000);
 		event1.setTitle("MyEvent");
-		event1.setAttendants(Arrays.asList(user1));
-		user1.setEvents(Arrays.asList(event1));
+//		event1.setAttendants(Arrays.asList(user1));
+//		user1.setEvents(Arrays.asList(event1));
 
 		session.save(user1);
 		session.save(event1);
