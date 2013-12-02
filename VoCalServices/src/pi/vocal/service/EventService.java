@@ -8,18 +8,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.jboss.logging.Logger;
+import org.apache.log4j.Logger;
 
 import pi.vocal.event.EventType;
 import pi.vocal.management.ErrorCode;
 import pi.vocal.management.EventManagement;
 import pi.vocal.management.exception.VocalServiceException;
-import pi.vocal.user.Grade;
 
 @Path("/EventMgmt")
 public class EventService {
-	private static final Logger logger = Logger.getLogger(EventService.class);
 
+	private final static Logger logger = Logger.getLogger(EventService.class); 
+	
 	@POST
 	@Path("/createEvent")
 	@Produces(MediaType.APPLICATION_JSON)

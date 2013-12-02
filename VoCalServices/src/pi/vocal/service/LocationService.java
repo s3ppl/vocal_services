@@ -1,4 +1,4 @@
-package pi.vocal.service.tests;
+package pi.vocal.service;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -13,8 +13,8 @@ import javax.ws.rs.core.MediaType;
 
 import pi.vocal.user.SchoolLocation;
 
-@Path("/MockService")
-public class LocationMockService {
+@Path("/LocationMgmt")
+public class LocationService {
 
 	@Context
 	private HttpServletResponse response;

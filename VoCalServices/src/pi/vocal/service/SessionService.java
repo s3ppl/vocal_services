@@ -5,14 +5,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.jboss.logging.Logger;
+import org.apache.log4j.Logger;
 
 import pi.vocal.management.ErrorCode;
 import pi.vocal.management.SessionManagement;
@@ -22,15 +20,10 @@ import pi.vocal.management.exception.VocalServiceException;
 public class SessionService {
 	private static final Logger log = Logger.getLogger(SessionService.class);
 	
-	// TODO return session id and user!!! (see TestService)
-//	@GET
 	@POST
 	@Path("/login")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<?> login(
-//			@QueryParam("email") String email,
-//			@QueryParam("password") String password) {
-			
+	public JsonResponse<?> login(		
 		@FormParam("email") String email,
 		@FormParam("password") String password) {
 		
@@ -61,12 +54,10 @@ public class SessionService {
 		return response;
 	}
 
-//	@GET
 	@POST
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<ErrorCode> logout(
-//			@QueryParam("id") String id) {
 			@FormParam("sessionId") String id) {
 		
 		JsonResponse<ErrorCode> response = new JsonResponse<>();

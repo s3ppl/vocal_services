@@ -5,7 +5,7 @@ import java.util.List;
 import pi.vocal.user.SchoolLocation;
 
 
-// TODO make me generic for enum usage
+// TODO make me generic for enum usage?
 public class SchoolLocationsDTO {
 
 	private List<SchoolLocation> locations;

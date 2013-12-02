@@ -3,13 +3,11 @@ package pi.vocal.management;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.ws.rs.FormParam;
 import javax.xml.bind.DatatypeConverter;
 
 import org.hibernate.HibernateException;
@@ -22,8 +20,8 @@ import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.service.dto.PublicUser;
 import pi.vocal.user.Grade;
-import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
+import pi.vocal.user.SchoolLocation;
 
 public class UserManagement {
 
@@ -68,8 +66,10 @@ public class UserManagement {
 	public static User getUserByEmail(String email) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
+		
 		User user = (User) session.createCriteria(User.class)
 				.add(Restrictions.eq("email", email)).uniqueResult();
+		
 		session.getTransaction().commit();
 		session.close();
 
@@ -237,6 +237,8 @@ public class UserManagement {
 		if (!new1.equals(new2)) {
 			throw new VocalServiceException(ErrorCode.PASSWORDS_DONT_MATCH);
 		}
+		
+		// TODO implement rest of this function
 	}
 
 	/**

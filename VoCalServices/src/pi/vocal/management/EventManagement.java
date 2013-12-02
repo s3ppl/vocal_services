@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.jboss.logging.Logger;
 
 import pi.vocal.event.EventType;
 import pi.vocal.management.exception.VocalServiceException;
@@ -17,9 +16,6 @@ import pi.vocal.service.dto.PublicEvent;
 import pi.vocal.user.Grade;
 
 public class EventManagement {
-
-	private final static Logger logger = Logger
-			.getLogger(EventManagement.class);
 
 	private EventManagement() {
 	}

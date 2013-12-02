@@ -4,22 +4,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.jboss.logging.Logger;
+import org.apache.log4j.Logger;
 
 import pi.vocal.management.ErrorCode;
-import pi.vocal.management.SuccessCode;
 import pi.vocal.management.UserManagement;
 import pi.vocal.management.exception.VocalServiceException;
-import pi.vocal.persistence.dto.User;
 import pi.vocal.user.Grade;
 import pi.vocal.user.SchoolLocation;
 
@@ -32,8 +28,6 @@ import pi.vocal.user.SchoolLocation;
 @Path("/UserMgmt")
 public class UserService {
 	private static final Logger LOGGER = Logger.getLogger(UserService.class);
-
-	private static final boolean DEBUG = true;
 
 	/**
 	 * This webservice creates a new user account with the given information.
@@ -53,18 +47,10 @@ public class UserService {
 	 * @return A list of {@code ErrorCode} which contains all errors, the users
 	 *         input has, like no password.
 	 */
-	// @GET
 	@POST
 	@Path("/createUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<List<ErrorCode>> createAccount(
-			// @QueryParam("firstname") String firstName,
-			// @QueryParam("lastname") String lastName,
-			// @QueryParam("email") String email,
-			// @QueryParam("password") String password,
-			// @QueryParam("grade") Grade grade,
-			// @QueryParam("schoollocation") Location location) {
-
 			@FormParam("firstname") String firstName,
 			@FormParam("lastname") String lastName,
 			@FormParam("email") String email,
@@ -72,17 +58,14 @@ public class UserService {
 			@FormParam("grade") Grade grade,
 			@FormParam("schoollocation") SchoolLocation location) {
 
-		// TODO change enum parameters to string for error checking server side?
 		List<ErrorCode> errors = null;
 
-		if (DEBUG) {
-			LOGGER.debug("Firstname Parameter: " + firstName);
-			LOGGER.debug("Lastname Parameter: " + lastName);
-			LOGGER.debug("Email Parameter: " + email);
-			LOGGER.debug("Password Parameter: " + password);
-			LOGGER.debug("Grade Parameter: " + grade);
-			LOGGER.debug("Location Parameter: " + location);
-		}
+		LOGGER.debug("Firstname Parameter: " + firstName);
+		LOGGER.debug("Lastname Parameter: " + lastName);
+		LOGGER.debug("Email Parameter: " + email);
+		LOGGER.debug("Password Parameter: " + password);
+		LOGGER.debug("Grade Parameter: " + grade);
+		LOGGER.debug("Location Parameter: " + location);
 
 		JsonResponse<List<ErrorCode>> response = new JsonResponse<>();
 		response.setSuccess(true);
@@ -108,31 +91,30 @@ public class UserService {
 		return response;
 	}
 
-//	@GET
 	@POST
 	@Path("/editUser")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<?> editAccount(
-			@FormParam("sessionId") UUID sessionId,
+	public JsonResponse<?> editAccount(@FormParam("sessionId") UUID sessionId,
 			@FormParam("firstname") String firstName,
 			@FormParam("lastname") String lastName,
 			@FormParam("password") String password,
 			@FormParam("schoollocation") SchoolLocation location) {
-	
+
 		try {
 			JsonResponse<Map<String, Object>> response = new JsonResponse<>();
 			Map<String, Object> result = null;
-			
-			result = UserManagement.editUser(sessionId, firstName, lastName, location);
+
+			result = UserManagement.editUser(sessionId, firstName, lastName,
+					location);
 			response.setSuccess(true);
 			response.setContent(result);
-			
+
 			return response;
-		} catch (VocalServiceException e) {			
+		} catch (VocalServiceException e) {
 			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
 			errorResponse.setSuccess(false);
 			errorResponse.setContent(e.getErrorCodes());
-			
+
 			return errorResponse;
 		}
 	}
