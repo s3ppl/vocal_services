@@ -94,7 +94,7 @@ public class UserService {
 	@POST
 	@Path("/editUser")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<?> editAccount(@FormParam("sessionId") UUID sessionId,
+	public JsonResponse<?> editAccount(@FormParam("sessionid") UUID sessionId,
 			@FormParam("firstname") String firstName,
 			@FormParam("lastname") String lastName,
 			@FormParam("password") String password,

@@ -58,7 +58,7 @@ public class SessionService {
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<ErrorCode> logout(
-			@FormParam("sessionId") String id) {
+			@FormParam("sessionid") String id) {
 		
 		JsonResponse<ErrorCode> response = new JsonResponse<>();
 		response.setSuccess(true);

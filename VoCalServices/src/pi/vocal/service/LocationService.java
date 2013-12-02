@@ -29,6 +29,7 @@ public class LocationService {
 			locList.put(l, l.getName());
 		}
 		
+		// set encoding to UTF-8 for compatibility
 		response.setCharacterEncoding("UTF-8");
 
 		return locList;

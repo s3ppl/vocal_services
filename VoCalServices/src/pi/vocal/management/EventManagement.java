@@ -49,6 +49,7 @@ public class EventManagement {
 	private static Set<Grade> createSetOfAttendanceGrades(
 			boolean childrenMayAttend, boolean disciplesMayAttend,
 			boolean trainersMayAttend, boolean mastersMayAttend) {
+		
 		Set<Grade> attendanceGrades = new HashSet<>();
 
 		if (childrenMayAttend) {
