@@ -8,8 +8,32 @@ import java.util.Arrays;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.xml.bind.DatatypeConverter;
 
 public class PasswordEncryptionHelper {
+	
+	/**
+	 * Encodes a given {@code String} to his base64 representation.
+	 * 
+	 * @param input
+	 *            The string to encode
+	 * @return A base64 representation of the given String
+	 */
+	public static String convertToBase64(byte[] input) {
+		return DatatypeConverter.printBase64Binary(input);
+	}
+	
+	/**
+	 * Converts a given {@code String}, that is encoded with base64 to a byte
+	 * array.
+	 * 
+	 * @param input
+	 *            The string to convert
+	 * @return A byte array, representing the given {@code String}.
+	 */
+	public static byte[] convertFromBase64(String input) {
+		return DatatypeConverter.parseBase64Binary(input);
+	}
 
 	public static boolean authenticate(String attemptedPassword,
 			byte[] encryptedPassword, byte[] salt)

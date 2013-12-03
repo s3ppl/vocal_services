@@ -2,7 +2,6 @@ package pi.vocal.service.tests;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -19,8 +18,8 @@ import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.user.Grade;
-import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
+import pi.vocal.user.SchoolLocation;
 
 @Path("/dbservice")
 public class HibernateMockservice {

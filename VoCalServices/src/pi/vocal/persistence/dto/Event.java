@@ -2,9 +2,9 @@ package pi.vocal.persistence.dto;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -58,14 +58,12 @@ public class Event implements Serializable {
 	@GeneratedValue
 	private long eventId;
 	
-	@OneToMany(mappedBy="event")
+	@OneToMany(mappedBy="eventId")
 	private Set<UserAttendance> userAttendances = new HashSet<>();
-
 	
-	// TODO sub table creation fails.... 
-	@Column(nullable=false)
 	@ElementCollection(targetClass=Grade.class)
-	private Set<Grade> attendantsGrades = new HashSet<>();
+	@CollectionTable(name="event_grades")
+	private Set<Grade> attendantsGrades;
 
 	public Long getStartDate() {
 		return startDate;
@@ -119,7 +117,7 @@ public class Event implements Serializable {
 		this.userAttendances = userAttendances;
 	}
 
-	public Set<Grade> getAttendantsGrades() {
+	public Set<Grade> getAttendantsGrades() {	
 		return attendantsGrades;
 	}
 
@@ -131,7 +129,11 @@ public class Event implements Serializable {
 		this.attendantsGrades.add(grade);
 	}
 	
-	public void addUserAttendance(UserAttendance userAttendancen) {
-		this.userAttendances.add(userAttendancen);
+	public void addUserAttendance(UserAttendance userAttendances) {
+		if (null == this.userAttendances) {
+			this.userAttendances = new HashSet<>();
+		}
+		
+		this.userAttendances.add(userAttendances);
 	}
 }

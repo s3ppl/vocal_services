@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import pi.vocal.event.EventType;
+import pi.vocal.management.EventManagement;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.persistence.dto.UserAttendance;
@@ -125,7 +126,7 @@ public class PublicUser {
 		Event event = null;
 		
 		for (UserAttendance ua : attendedEvents) {
-			event = ua.getEvent();
+			event = EventManagement.getEventById(ua.getEventId());
 			
 			userEvent = new UserEvent();
 			userEvent.setDescription(event.getDescription());

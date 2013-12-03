@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import pi.vocal.event.EventType;
+import pi.vocal.management.UserManagement;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.persistence.dto.UserAttendance;
@@ -96,7 +97,7 @@ public class PublicEvent {
 		EventUser attendant = null;
 		User user = null;
 		for (UserAttendance userAttendance : userAttendances) {
-			user = userAttendance.getUser();
+			user = UserManagement.getUserById(userAttendance.getUserId());
 			
 			attendant = new EventUser();
 			attendant.setEmail(user.getEmail());

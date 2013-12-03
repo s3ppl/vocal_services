@@ -35,18 +35,20 @@ public class SessionService {
 
 		try {
 			response.setContent(SessionManagement.login(email, password));
-		} catch (VocalServiceException e) {
-			if (e.getErrorCodes().size() == 1
-					&& e.getErrorCodes().get(0) == ErrorCode.INTERNAL_ERROR) {
-				
-				log.error(
-						"Login failed. See nested exceptions for further detail." + 
-						e.getStackTrace());
-			}
+		} catch (Exception e) { // TODO change keep as exception!?
+//			if (e.getErrorCodes().size() == 1
+//					&& e.getErrorCodes().get(0) == ErrorCode.INTERNAL_ERROR) {
+//				
+//				log.error(
+//						"Login failed. See nested exceptions for further detail." + 
+//						e.getStackTrace());
+//			}
 
 			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
 			errorResponse.setSuccess(false);
-			errorResponse.setContent(e.getErrorCodes());
+			
+			if (e instanceof VocalServiceException)
+				errorResponse.setContent(((VocalServiceException) e).getErrorCodes());	
 
 			return errorResponse;
 		}

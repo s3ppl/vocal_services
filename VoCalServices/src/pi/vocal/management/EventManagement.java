@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
@@ -12,10 +14,16 @@ import pi.vocal.event.EventType;
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.Event;
+import pi.vocal.persistence.dto.User;
+import pi.vocal.persistence.dto.UserAttendance;
 import pi.vocal.service.dto.PublicEvent;
 import pi.vocal.user.Grade;
+import pi.vocal.user.Role;
 
+// TODO comment this class
 public class EventManagement {
+	private final static Logger logger = Logger
+			.getLogger(EventManagement.class);
 
 	private EventManagement() {
 	}
@@ -25,22 +33,28 @@ public class EventManagement {
 
 		if (null == event.getTitle() || event.getTitle().isEmpty()) {
 			errors.add(ErrorCode.TITLE_MISSING);
+			logger.warn("Title of event missing!");
 		}
 
 		if (null == event.getStartDate()) {
 			errors.add(ErrorCode.STARTDATE_MISSING);
+			logger.warn("Startdate of event missing!");
 		} else if (null == event.getEndDate()) {
 			errors.add(ErrorCode.ENDDATE_MISSING);
-		} else 	if (event.getStartDate() > event.getEndDate()) {
+			logger.warn("Enddate of event missing!");
+		} else if (event.getStartDate() > event.getEndDate()) {
 			errors.add(ErrorCode.STARTDATE_AFTER_ENDDATE);
+			logger.warn("Startdate was after endate!");
 		}
 
 		if (event.getAttendantsGrades().size() < 1) {
 			errors.add(ErrorCode.NO_ATTENDANCE_GRADE_SELECTED);
+			logger.warn("No attendances grades selected!");
 		}
 
 		if (null == event.getEventType()) {
 			errors.add(ErrorCode.EVENT_TYPE_MISSING);
+			logger.warn("No event type selected!");
 		}
 
 		return errors;
@@ -49,7 +63,7 @@ public class EventManagement {
 	private static Set<Grade> createSetOfAttendanceGrades(
 			boolean childrenMayAttend, boolean disciplesMayAttend,
 			boolean trainersMayAttend, boolean mastersMayAttend) {
-		
+
 		Set<Grade> attendanceGrades = new HashSet<>();
 
 		if (childrenMayAttend) {
@@ -97,24 +111,62 @@ public class EventManagement {
 
 		return eventDto;
 	}
+	
+	private static void inviteUsersToEvent(Event event) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+		List<User> users;
+		UserAttendance userAttendance;
+		for (Grade grade : event.getAttendantsGrades()) {
+			users = UserManagement.getUsersByGrade(grade);
+			
+			for (User user : users) {
+				userAttendance = new UserAttendance();
+				userAttendance.setAttends(false);
+				userAttendance.setEventId(event.getEventId());
+				userAttendance.setUserId(user.getUserId());
+				
+				user.addUserAttendance(userAttendance);
+				event.addUserAttendance(userAttendance);
+				
+				session.beginTransaction();
+				session.update(user);
+				session.update(event);
+				session.save(userAttendance);
+				session.getTransaction().commit();
+			}
+		}
+		
+		session.close();
+	}
 
-	public static PublicEvent getEventById(long id) {
+	public static Event getEventById(long id) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
 		Event event = (Event) session.get(Event.class, id);
 		session.getTransaction().commit();
 		session.close();
 
-		return new PublicEvent(event);
+		return event;
 	}
 
 	// TODO add auto invite for all users with according grades!
-	public static PublicEvent createEvent(String title, String description,
-			Long startDate, Long endDate, EventType type,
+	public static void createEvent(UUID sessionId, String title,
+			String description, Long startDate, Long endDate, EventType type,
 			boolean childrenMayAttend, boolean disciplesMayAttend,
 			boolean trainersMayAttend, boolean mastersMayAttend)
 			throws VocalServiceException {
-		
+
+		// check session validity and permissions
+		User user = SessionManagement.getUserBySessionId(sessionId);
+		if (null == user) {
+			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
+		} /*
+		 * else if (user.getRole() != Role.ADMIN && user.getRole() !=
+		 * Role.MANAGER) { throw new
+		 * VocalServiceException(ErrorCode.INVALID_USER_PERMISSIONS); }
+		 */// FIXME uncomment permission checks after testing is done!
+
 		Event event = createEventFromInput(title, description, startDate,
 				endDate, type, childrenMayAttend, disciplesMayAttend,
 				trainersMayAttend, mastersMayAttend);
@@ -127,17 +179,17 @@ public class EventManagement {
 			session.getTransaction().commit();
 			session.close();
 		} catch (HibernateException e) {
-			if (null != session && session.isOpen()) {
-				session.getTransaction().rollback();
-			}
+			// if (null != session && session.isOpen()) {
+			// session.getTransaction().rollback();
+			// }
 
-			throw new VocalServiceException(
-					ErrorCode.INTERNAL_ERROR,
-					"Could not create Account. Storing to the database failed. See nested Exception for further details.",
+			String errorMsg = "Could not create Account. Storing to the database failed. See nested Exception for further details.";
+			logger.error(errorMsg, e);
+			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, errorMsg,
 					e);
 		}
-
-		return null;
+		
+		inviteUsersToEvent(event);
 	}
 
 }

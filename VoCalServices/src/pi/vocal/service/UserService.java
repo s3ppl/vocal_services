@@ -14,13 +14,14 @@ import javax.ws.rs.core.MediaType;
 import org.apache.log4j.Logger;
 
 import pi.vocal.management.ErrorCode;
+import pi.vocal.management.SuccessCode;
 import pi.vocal.management.UserManagement;
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.user.Grade;
 import pi.vocal.user.SchoolLocation;
 
-// TODO change QueryParam to FormParam for POST-Requests!
 /**
+ * WebService that contains all user relevant methods such as creating and editing.
  * 
  * @author s3ppl
  * 
@@ -60,13 +61,6 @@ public class UserService {
 
 		List<ErrorCode> errors = null;
 
-		LOGGER.debug("Firstname Parameter: " + firstName);
-		LOGGER.debug("Lastname Parameter: " + lastName);
-		LOGGER.debug("Email Parameter: " + email);
-		LOGGER.debug("Password Parameter: " + password);
-		LOGGER.debug("Grade Parameter: " + grade);
-		LOGGER.debug("Location Parameter: " + location);
-
 		JsonResponse<List<ErrorCode>> response = new JsonResponse<>();
 		response.setSuccess(true);
 
@@ -97,7 +91,6 @@ public class UserService {
 	public JsonResponse<?> editAccount(@FormParam("sessionid") UUID sessionId,
 			@FormParam("firstname") String firstName,
 			@FormParam("lastname") String lastName,
-			@FormParam("password") String password,
 			@FormParam("schoollocation") SchoolLocation location) {
 
 		try {
@@ -115,6 +108,30 @@ public class UserService {
 			errorResponse.setSuccess(false);
 			errorResponse.setContent(e.getErrorCodes());
 
+			return errorResponse;
+		}
+	}
+
+	@POST
+	@Path("/changeUserPassword")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JsonResponse<?> changePassword(
+			@FormParam("sessionid") UUID sessionId,
+			@FormParam("oldpassword") String oldPassword,
+			@FormParam("newpassword1") String newPassword1,
+			@FormParam("newpassword2") String newPassword2) {
+
+		try {
+			JsonResponse<SuccessCode> response = new JsonResponse<>();
+			response.setSuccess(true);
+			response.setContent(UserManagement.changePassword(sessionId,
+					oldPassword, newPassword1, newPassword2));
+
+			return response;
+		} catch (VocalServiceException e) {
+			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
+			errorResponse.setContent(e.getErrorCodes());
+			errorResponse.setSuccess(false);
 			return errorResponse;
 		}
 	}

@@ -1,6 +1,7 @@
 package pi.vocal.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -24,6 +25,7 @@ public class EventService {
 	@Path("/createEvent")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<List<ErrorCode>> createEvent(
+			@FormParam("sessionid") UUID sessionId,
 			@FormParam("title") String title,
 			@FormParam("description") String description,
 			@FormParam("startdate") Long startDate,
@@ -38,11 +40,9 @@ public class EventService {
 		response.setSuccess(true);
 
 		List<ErrorCode> errors = null;
-		
-		logger.debug("foobar!!!!11111einself");
 
 		try {
-			EventManagement.createEvent(title, description, startDate, endDate,
+			EventManagement.createEvent(sessionId, title, description, startDate, endDate,
 					type, childrenMayAttend, disciplesMayAttend,
 					trainersMayAttend, mastersMayAttend);
 		} catch (VocalServiceException e) {

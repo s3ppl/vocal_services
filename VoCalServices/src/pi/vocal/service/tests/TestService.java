@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -15,7 +16,9 @@ import javax.ws.rs.core.MediaType;
 
 import org.hibernate.Session;
 
-import pi.vocal.event.EventType;
+import pi.vocal.management.SessionManagement;
+import pi.vocal.management.UserManagement;
+import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
@@ -32,6 +35,18 @@ public class TestService {
 
 	@Context
 	HttpServletRequest request;
+	
+	public TestService() {
+		System.err.println("SERVICE STARTED!!!1111");
+	}
+	
+	@GET
+	@Path("/getUsersBygrade")
+	public String getUsersByGrade() {
+		UserManagement.getUsersByGrade(Grade.MASTER);		
+		
+		return "done...";
+	}
 
 	@GET
 	@Path("/getUser")
@@ -89,17 +104,18 @@ public class TestService {
 	@GET
 	@Path("/createUserAndEvent")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String autoCreateUserAndEvent() {
+	public String autoCreateUserAndEvent() throws VocalServiceException {
 		User user = new User();
 		user.setEmail("foo@bar.de");
 		user.setFirstName("hans");
 		user.setLastName("bert");
 		user.setGrade(Grade.DISCIPLE);
 		user.setSchoolLocation(SchoolLocation.MUEHLACKER);
+		String password = "foobar1";
 
 		UserService us = new UserService();
 		us.createAccount(user.getFirstName(), user.getLastName(),
-				user.getEmail(), "foobar1", user.getGrade(),
+				user.getEmail(), password, user.getGrade(),
 				user.getSchoolLocation());
 
 		Event event = new Event();
@@ -107,10 +123,13 @@ public class TestService {
 		event.setTitle("test event");
 		event.setStartDate(System.currentTimeMillis());
 		event.setEndDate(System.currentTimeMillis() + 10000);
-		event.setEventType(EventType.DEMO);
+//		event.setEventType(EventType.DEMO);
+
+		UUID sessionId = (UUID) SessionManagement.login(user.getEmail(),
+				password).get("sessionId");
 
 		EventService es = new EventService();
-		es.createEvent(event.getTitle(), event.getDescription(),
+		es.createEvent(sessionId, event.getTitle(), event.getDescription(),
 				event.getStartDate(), event.getEndDate(), event.getEventType(),
 				true, false, false, false);
 
@@ -119,8 +138,8 @@ public class TestService {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
 
-		ua.setUser((User) session.get(User.class, 1L));
-		ua.setEvent((Event) session.get(Event.class, 1L));
+//		ua.setUser((User) session.get(User.class, 1L));
+//		ua.setEvent((Event) session.get(Event.class, 1L));
 
 		event = (Event) session.get(Event.class, 1L);
 		System.out.println(event.getAttendantsGrades());

@@ -7,13 +7,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.xml.bind.DatatypeConverter;
-
-import org.jboss.logging.Logger;
+import org.apache.log4j.Logger;
 
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.management.helper.PasswordEncryptionHelper;
 import pi.vocal.persistence.dto.User;
+import pi.vocal.service.dto.PublicUser;
 
 /**
  * This class handles the login and logout of a user.
@@ -104,18 +103,6 @@ public class SessionManagement {
 	}
 
 	/**
-	 * Converts a given {@code String}, that is encoded with base64 to a byte
-	 * array.
-	 * 
-	 * @param input
-	 *            The string to convert
-	 * @return A byte array, representing the given {@code String}.
-	 */
-	private static byte[] convertFromBase64(String input) {
-		return DatatypeConverter.parseBase64Binary(input);
-	}
-
-	/**
 	 * Handles the login of user.
 	 * 
 	 * @param email
@@ -142,8 +129,8 @@ public class SessionManagement {
 			boolean success = false;
 
 			if (null != user) {
-				byte[] userPwHash = convertFromBase64(user.getPwHash());
-				byte[] userPwSalt = convertFromBase64(user.getPwSalt());
+				byte[] userPwHash = PasswordEncryptionHelper.convertFromBase64(user.getPwHash());
+				byte[] userPwSalt = PasswordEncryptionHelper.convertFromBase64(user.getPwSalt());
 
 				success = PasswordEncryptionHelper.authenticate(password,
 						userPwHash, userPwSalt);
@@ -161,7 +148,7 @@ public class SessionManagement {
 		UUID sessionId = generateSessionId();
 		sessions.put(sessionId, user);
 
-		result.put("user", user);
+		result.put("user", new PublicUser(user));
 		result.put("sessionId", sessionId);
 
 		return result;
