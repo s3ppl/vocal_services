@@ -1,4 +1,4 @@
-package pi.vocal.service;
+package pi.vocal.service.dto;
 
 /**
  * Wrapper class that are used by JSON webservices. This class will be mapped by

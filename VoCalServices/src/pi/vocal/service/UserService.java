@@ -19,6 +19,7 @@ import pi.vocal.management.UserManagement;
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.management.helper.ResultConstants;
 import pi.vocal.persistence.dto.User;
+import pi.vocal.service.dto.JsonResponse;
 import pi.vocal.service.dto.PublicUser;
 import pi.vocal.user.Grade;
 import pi.vocal.user.SchoolLocation;

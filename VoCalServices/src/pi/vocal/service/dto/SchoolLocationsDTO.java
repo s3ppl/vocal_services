@@ -1,4 +1,4 @@
-package pi.vocal.service;
+package pi.vocal.service.dto;
 
 import java.util.List;
 

@@ -17,6 +17,7 @@ import pi.vocal.management.ErrorCode;
 import pi.vocal.management.EventManagement;
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.persistence.dto.Event;
+import pi.vocal.service.dto.JsonResponse;
 import pi.vocal.service.dto.PublicEvent;
 import pi.vocal.service.dto.PublicUser;
 

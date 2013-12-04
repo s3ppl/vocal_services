@@ -180,10 +180,6 @@ public class EventManagement {
 			session.getTransaction().commit();
 			session.close();
 		} catch (HibernateException e) {
-			// if (null != session && session.isOpen()) {
-			// session.getTransaction().rollback();
-			// }
-
 			String errorMsg = "Could not create Account. Storing to the database failed. See nested Exception for further details.";
 			logger.error(errorMsg, e);
 			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, errorMsg,
