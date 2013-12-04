@@ -61,15 +61,16 @@ public class UserManagement {
 
 		return user;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static List<User> getUsersByGrade(Grade grade) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		session.beginTransaction();	
-		List<User> result = session.createCriteria(User.class).add(Restrictions.eq("grade", grade)).list();
+		session.beginTransaction();
+		List<User> result = session.createCriteria(User.class)
+				.add(Restrictions.eq("grade", grade)).list();
 		session.getTransaction().commit();
 		session.close();
-		
+
 		return result;
 	}
 
@@ -110,7 +111,7 @@ public class UserManagement {
 		} else if (password.length() < MIN_PW_LEN) {
 			errorCodes.add(ErrorCode.PASSWORD_TOO_SHORT);
 		}
-		
+
 		if (null == user.getEmail() || user.getEmail().isEmpty()) {
 			errorCodes.add(ErrorCode.EMAIL_MISSING);
 		} else if (!user.getEmail().matches(EMAIL_MATCH_STRING)) {
@@ -249,11 +250,11 @@ public class UserManagement {
 			session.getTransaction().commit();
 			session.close();
 		} catch (HibernateException he) {
-//			if (null != session && session.isOpen()
-//					&& null != session.getTransaction()) {
-//
-//				session.getTransaction().rollback();
-//			}
+			// if (null != session && session.isOpen()
+			// && null != session.getTransaction()) {
+			//
+			// session.getTransaction().rollback();
+			// }
 
 			throw new VocalServiceException(
 					ErrorCode.INTERNAL_ERROR,
@@ -277,12 +278,10 @@ public class UserManagement {
 	 * @return Returns a {@code SuccessCode} that confirms that the password was
 	 *         changed correctly
 	 * @throws VocalServiceException
-	 *             Thrown if:
-	 *             a) a given password was null
-	 *             b) the two new passwords don't match 
-	 *             c) the new password is too short
-	 *             d) the current password was incorrect
-	 *             e) the given sessionId could not be found
+	 *             Thrown if: a) a given password was null b) the two new
+	 *             passwords don't match c) the new password is too short d) the
+	 *             current password was incorrect e) the given sessionId could
+	 *             not be found
 	 */
 	public static SuccessCode changePassword(UUID sessionId,
 			String oldPassword, String newPassword1, String newPassword2)
@@ -299,7 +298,7 @@ public class UserManagement {
 		if (null != user) {
 			if (null == oldPassword
 					|| !verifyCurrentPassword(user, oldPassword)) {
-				
+
 				throw new VocalServiceException(ErrorCode.AUTHENTICATION_FAILED);
 			}
 
@@ -307,22 +306,27 @@ public class UserManagement {
 			try {
 				// generate new password and salt for storing
 				byte[] newPwSalt = PasswordEncryptionHelper.generateSalt();
-				byte[] newPwHash = PasswordEncryptionHelper.getEncryptedPassword(newPassword1, newPwSalt);
-				String encodedPw = PasswordEncryptionHelper.convertToBase64(newPwHash);
-				String encodedSalt = PasswordEncryptionHelper.convertToBase64(newPwSalt);
-				
+				byte[] newPwHash = PasswordEncryptionHelper
+						.getEncryptedPassword(newPassword1, newPwSalt);
+				String encodedPw = PasswordEncryptionHelper
+						.convertToBase64(newPwHash);
+				String encodedSalt = PasswordEncryptionHelper
+						.convertToBase64(newPwSalt);
+
 				user.setPwHash(encodedPw);
 				user.setPwSalt(encodedSalt);
-				
+
 				// persist the changed user object
-				Session session = HibernateUtil.getSessionFactory().openSession();
+				Session session = HibernateUtil.getSessionFactory()
+						.openSession();
 				session.beginTransaction();
 				session.update(user);
 				session.getTransaction().commit();
 				session.close();
-			} catch (NoSuchAlgorithmException | InvalidKeySpecException | HibernateException e) {
+			} catch (NoSuchAlgorithmException | InvalidKeySpecException
+					| HibernateException e) {
 				throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, e);
-			}			
+			}
 		} else {
 			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
 		}
@@ -337,7 +341,7 @@ public class UserManagement {
 	 *            The id of the user to find
 	 * @return The PublicUser object of the user according to the given id
 	 */
-	//TODO change comment!
+	// TODO change comment!
 	public static User getUserById(long id) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
@@ -398,7 +402,7 @@ public class UserManagement {
 			session.close();
 
 			result.put("successcodes", successCodes);
-			result.put("user", user);
+			result.put("user", new PublicUser(user));
 		} else {
 			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
 		}

@@ -191,5 +191,7 @@ public class EventManagement {
 		
 		inviteUsersToEvent(event);
 	}
+	
+//	public List<PublicEvent>
 
 }
