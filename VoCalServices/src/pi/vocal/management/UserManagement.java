@@ -14,9 +14,9 @@ import org.hibernate.criterion.Restrictions;
 
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.management.helper.PasswordEncryptionHelper;
+import pi.vocal.management.helper.ResultConstants;
 import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.User;
-import pi.vocal.service.dto.PublicUser;
 import pi.vocal.user.Grade;
 import pi.vocal.user.Role;
 import pi.vocal.user.SchoolLocation;
@@ -370,11 +370,11 @@ public class UserManagement {
 	 *             Thrown if the user with the given session id could not be
 	 *             found
 	 */
-	public static Map<String, Object> editUser(UUID sessionId,
+	public static Map<Enum<ResultConstants>, Object> editUser(UUID sessionId,
 			String firstName, String lastName, SchoolLocation location)
 			throws VocalServiceException {
 
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<Enum<ResultConstants>, Object> result = new HashMap<Enum<ResultConstants>, Object>();
 		List<SuccessCode> successCodes = new ArrayList<>();
 
 		User user = SessionManagement.getUserBySessionId(sessionId);
@@ -401,8 +401,8 @@ public class UserManagement {
 			session.getTransaction().commit();
 			session.close();
 
-			result.put("successcodes", successCodes);
-			result.put("user", new PublicUser(user));
+			result.put(ResultConstants.EDITUSER_SUCCESSCODES_KEY, successCodes);
+			result.put(ResultConstants.EDITUSER_USER_KEY, user);
 		} else {
 			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
 		}

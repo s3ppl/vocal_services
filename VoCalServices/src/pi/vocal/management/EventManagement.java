@@ -192,6 +192,9 @@ public class EventManagement {
 		inviteUsersToEvent(event);
 	}
 	
-//	public List<PublicEvent>
+	// TODO Dont use services DTO classes in logical classes
+	public List<PublicEvent> getDateInterval(UUID sessionId, long startDate, long endDate) {
+		return null;
+	}
 
 }

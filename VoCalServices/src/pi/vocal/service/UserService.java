@@ -17,11 +17,15 @@ import pi.vocal.management.ErrorCode;
 import pi.vocal.management.SuccessCode;
 import pi.vocal.management.UserManagement;
 import pi.vocal.management.exception.VocalServiceException;
+import pi.vocal.management.helper.ResultConstants;
+import pi.vocal.persistence.dto.User;
+import pi.vocal.service.dto.PublicUser;
 import pi.vocal.user.Grade;
 import pi.vocal.user.SchoolLocation;
 
 /**
- * WebService that contains all user relevant methods such as creating and editing.
+ * WebService that contains all user relevant methods such as creating and
+ * editing.
  * 
  * @author s3ppl
  * 
@@ -94,11 +98,16 @@ public class UserService {
 			@FormParam("schoollocation") SchoolLocation location) {
 
 		try {
-			JsonResponse<Map<String, Object>> response = new JsonResponse<>();
-			Map<String, Object> result = null;
+			JsonResponse<Map<Enum<ResultConstants>, Object>> response = new JsonResponse<>();
+			Map<Enum<ResultConstants>, Object> result = null;
 
 			result = UserManagement.editUser(sessionId, firstName, lastName,
 					location);
+
+			// replace the persistent user object with a PublicUser
+			result.put(ResultConstants.EDITUSER_USER_KEY, new PublicUser(
+					(User) result.get(ResultConstants.EDITUSER_USER_KEY)));
+
 			response.setSuccess(true);
 			response.setContent(result);
 

@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.management.helper.PasswordEncryptionHelper;
+import pi.vocal.management.helper.ResultConstants;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.service.dto.PublicUser;
 
@@ -115,7 +116,7 @@ public class SessionManagement {
 	 *             Thrown if either the authentication of the user failed or an
 	 *             internal error occurred.
 	 */
-	public synchronized static Map<String, Object> login(String email,
+	public synchronized static Map<Enum<ResultConstants>, Object> login(String email,
 			String password) throws VocalServiceException {
 
 		// make sure the user won't get logged in twice
@@ -123,14 +124,16 @@ public class SessionManagement {
 
 		// get the according user from the database
 		User user = UserManagement.getUserByEmail(email);
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<Enum<ResultConstants>, Object> result = new HashMap<Enum<ResultConstants>, Object>();
 
 		try {
 			boolean success = false;
 
 			if (null != user) {
-				byte[] userPwHash = PasswordEncryptionHelper.convertFromBase64(user.getPwHash());
-				byte[] userPwSalt = PasswordEncryptionHelper.convertFromBase64(user.getPwSalt());
+				byte[] userPwHash = PasswordEncryptionHelper
+						.convertFromBase64(user.getPwHash());
+				byte[] userPwSalt = PasswordEncryptionHelper
+						.convertFromBase64(user.getPwSalt());
 
 				success = PasswordEncryptionHelper.authenticate(password,
 						userPwHash, userPwSalt);
@@ -148,8 +151,8 @@ public class SessionManagement {
 		UUID sessionId = generateSessionId();
 		sessions.put(sessionId, user);
 
-		result.put("user", new PublicUser(user));
-		result.put("sessionId", sessionId);
+		result.put(ResultConstants.LOGIN_USER_KEY, user);
+		result.put(ResultConstants.LOGIN_SESSIONID_KEY, sessionId);
 
 		return result;
 	}

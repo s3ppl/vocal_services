@@ -3,7 +3,9 @@ package pi.vocal.service.tests;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +21,7 @@ import org.hibernate.Session;
 import pi.vocal.management.SessionManagement;
 import pi.vocal.management.UserManagement;
 import pi.vocal.management.exception.VocalServiceException;
+import pi.vocal.management.helper.ResultConstants;
 import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
@@ -35,13 +38,18 @@ public class TestService {
 
 	@Context
 	HttpServletRequest request;
-	
-	public TestService() {
-		System.err.println("SERVICE STARTED!!!1111");
+
+	@GET
+	@Path("testEnumParsing")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Map<Enum<?>, Object> testEnumParsing() {
+		Map<Enum<?>, Object> result = new HashMap<Enum<?>, Object>();
+		result.put(ResultConstants.EDITUSER_SUCCESSCODES_KEY, "TEST");
+		return result;
 	}
 	
 	@GET
-	@Path("/getUsersBygrade")
+	@Path("/getUsersBygrade")	
 	public String getUsersByGrade() {
 		UserManagement.getUsersByGrade(Grade.MASTER);		
 		
