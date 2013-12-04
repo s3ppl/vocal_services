@@ -1,5 +1,6 @@
 package pi.vocal.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,12 +16,15 @@ import pi.vocal.event.EventType;
 import pi.vocal.management.ErrorCode;
 import pi.vocal.management.EventManagement;
 import pi.vocal.management.exception.VocalServiceException;
+import pi.vocal.persistence.dto.Event;
+import pi.vocal.service.dto.PublicEvent;
+import pi.vocal.service.dto.PublicUser;
 
 @Path("/EventMgmt")
 public class EventService {
 
-	private final static Logger logger = Logger.getLogger(EventService.class); 
-	
+	private final static Logger logger = Logger.getLogger(EventService.class);
+
 	@POST
 	@Path("/createEvent")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -42,9 +46,9 @@ public class EventService {
 		List<ErrorCode> errors = null;
 
 		try {
-			EventManagement.createEvent(sessionId, title, description, startDate, endDate,
-					type, childrenMayAttend, disciplesMayAttend,
-					trainersMayAttend, mastersMayAttend);
+			EventManagement.createEvent(sessionId, title, description,
+					startDate, endDate, type, childrenMayAttend,
+					disciplesMayAttend, trainersMayAttend, mastersMayAttend);
 		} catch (VocalServiceException e) {
 			if (e.getErrorCodes().contains(ErrorCode.INTERNAL_ERROR)) {
 				logger.error(
@@ -61,4 +65,32 @@ public class EventService {
 		return response;
 	}
 
+	@POST
+	@Path("/getEventsBetween")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JsonResponse<List<?>> getEventsBetween(
+			@FormParam("sessionid") UUID sessionId,
+			@FormParam("startdate") long startDate,
+			@FormParam("enddate") long endDate) {
+		
+		JsonResponse<List<?>> response = new JsonResponse<>();
+		response.setSuccess(true);
+
+		try {
+			response = new JsonResponse<>();
+			List<Event> internalEvents = EventManagement.getDateInterval(
+					sessionId, startDate, endDate);
+			List<PublicEvent> resultEvents = new ArrayList<>();
+
+			for (Event event : internalEvents) {
+				resultEvents.add(new PublicEvent(event));
+			}
+
+			response.setContent(resultEvents);
+		} catch (VocalServiceException e) {
+			response.setSuccess(false);
+			response.setContent(e.getErrorCodes());
+		}
+		return response;
+	}
 }

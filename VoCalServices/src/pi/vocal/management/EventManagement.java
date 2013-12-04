@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 import pi.vocal.event.EventType;
 import pi.vocal.management.exception.VocalServiceException;
@@ -16,9 +17,7 @@ import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.persistence.dto.UserAttendance;
-import pi.vocal.service.dto.PublicEvent;
 import pi.vocal.user.Grade;
-import pi.vocal.user.Role;
 
 // TODO comment this class
 public class EventManagement {
@@ -111,24 +110,24 @@ public class EventManagement {
 
 		return eventDto;
 	}
-	
+
 	private static void inviteUsersToEvent(Event event) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		
+
 		List<User> users;
 		UserAttendance userAttendance;
 		for (Grade grade : event.getAttendantsGrades()) {
 			users = UserManagement.getUsersByGrade(grade);
-			
+
 			for (User user : users) {
 				userAttendance = new UserAttendance();
 				userAttendance.setAttends(false);
 				userAttendance.setEventId(event.getEventId());
 				userAttendance.setUserId(user.getUserId());
-				
+
 				user.addUserAttendance(userAttendance);
 				event.addUserAttendance(userAttendance);
-				
+
 				session.beginTransaction();
 				session.update(user);
 				session.update(event);
@@ -136,7 +135,7 @@ public class EventManagement {
 				session.getTransaction().commit();
 			}
 		}
-		
+
 		session.close();
 	}
 
@@ -188,13 +187,42 @@ public class EventManagement {
 			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, errorMsg,
 					e);
 		}
-		
+
 		inviteUsersToEvent(event);
 	}
-	
-	// TODO Dont use services DTO classes in logical classes
-	public List<PublicEvent> getDateInterval(UUID sessionId, long startDate, long endDate) {
-		return null;
+
+	@SuppressWarnings("unchecked")
+	public static List<Event> getDateInterval(UUID sessionId, long startDate,
+			long endDate) throws VocalServiceException {
+
+		User user = SessionManagement.getUserBySessionId(sessionId);
+		List<Event> events = new ArrayList<>();
+
+		if (null != user) {
+			Session session = HibernateUtil.getSessionFactory().openSession();
+
+			Event event;
+			for (UserAttendance ua : user.getUserAttendance()) {
+				session.beginTransaction();
+				event = (Event) session.get(Event.class, ua.getEventId());
+				session.getTransaction().commit();
+
+				if ((event.getStartDate() >= startDate && event.getStartDate() <= endDate)
+						|| (event.getEndDate() >= startDate && event
+								.getEndDate() <= endDate)) {
+					
+					events.add(event);
+				}
+			}
+			
+			session.close();
+		} else {
+			logger.warn("No user with the following session id could be found: "
+					+ sessionId);
+			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
+		}
+
+		return events;
 	}
 
 }

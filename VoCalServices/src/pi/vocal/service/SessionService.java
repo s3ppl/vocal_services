@@ -42,13 +42,13 @@ public class SessionService {
 					(User) result.get(ResultConstants.LOGIN_USER_KEY)));
 			response.setContent(result);
 		} catch (Exception e) { // TODO keep as exception!?
-		// if (e.getErrorCodes().size() == 1
-		// && e.getErrorCodes().get(0) == ErrorCode.INTERNAL_ERROR) {
-		//
-		// log.error(
-		// "Login failed. See nested exceptions for further detail." +
-		// e.getStackTrace());
-		// }
+			// if (e.getErrorCodes().size() == 1
+			// && e.getErrorCodes().get(0) == ErrorCode.INTERNAL_ERROR) {
+			//
+			// log.error(
+			// "Login failed. See nested exceptions for further detail." +
+			// e.getStackTrace());
+			// }
 
 			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
 			errorResponse.setSuccess(false);
@@ -66,23 +66,7 @@ public class SessionService {
 	@POST
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<ErrorCode> logout(@FormParam("sessionid") String id) {
-
-		JsonResponse<ErrorCode> response = new JsonResponse<>();
-		response.setSuccess(true);
-
-		try {
-			UUID sessionId = UUID.fromString(id);
-			SessionManagement.logout(sessionId);
-		} catch (IllegalArgumentException e) {
-			log.error(
-					"The given session id had an invalid format. See nested exceptions for further details",
-					e);
-
-			response.setSuccess(false);
-			response.setContent(ErrorCode.INTERNAL_ERROR);
-		}
-
-		return response;
+	public void logout(@FormParam("sessionid") UUID id) {
+		SessionManagement.logout(id);
 	}
 }
