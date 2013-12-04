@@ -380,6 +380,7 @@ public class UserManagement {
 		User user = SessionManagement.getUserBySessionId(sessionId);
 
 		if (null != user) {
+			// check the given user object for changes
 			if (null != firstName && !user.getFirstName().equals(firstName)) {
 				user.setFirstName(firstName);
 				successCodes.add(SuccessCode.FIRSTNAME_CHANGED);
@@ -395,11 +396,15 @@ public class UserManagement {
 				successCodes.add(SuccessCode.SCHOOL_LOCATION_CHANGED);
 			}
 
+			// persist the changed user object
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			session.beginTransaction();
 			session.update(user);
 			session.getTransaction().commit();
 			session.close();
+			
+			// keep the user object of the session up to date
+			SessionManagement.updateSessionUser(sessionId, user);
 
 			result.put(ResultConstants.EDITUSER_SUCCESSCODES_KEY, successCodes);
 			result.put(ResultConstants.EDITUSER_USER_KEY, user);

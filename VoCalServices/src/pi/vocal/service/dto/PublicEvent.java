@@ -1,5 +1,6 @@
 package pi.vocal.service.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +24,7 @@ public class PublicEvent {
 
 	private long eventId;
 	
-	private List<EventUser> attendants;
+	private List<EventUser> attendants = new ArrayList<EventUser>();
 	
 	public PublicEvent() {}
 

@@ -77,11 +77,10 @@ public class EventService {
 		response.setSuccess(true);
 
 		try {
-			response = new JsonResponse<>();
-			List<Event> internalEvents = EventManagement.getDateInterval(
-					sessionId, startDate, endDate);
 			List<PublicEvent> resultEvents = new ArrayList<>();
-
+			List<Event> internalEvents = EventManagement.getEventsBetween(
+					sessionId, startDate, endDate);
+			
 			for (Event event : internalEvents) {
 				resultEvents.add(new PublicEvent(event));
 			}
@@ -91,6 +90,7 @@ public class EventService {
 			response.setSuccess(false);
 			response.setContent(e.getErrorCodes());
 		}
+		
 		return response;
 	}
 }

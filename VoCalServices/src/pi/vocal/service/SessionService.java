@@ -21,16 +21,13 @@ import pi.vocal.service.dto.PublicUser;
 
 @Path("/SessionMgmt")
 public class SessionService {
-	private static final Logger log = Logger.getLogger(SessionService.class);
+	private static final Logger logger = Logger.getLogger(SessionService.class);
 
 	@POST
 	@Path("/login")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<?> login(@FormParam("email") String email,
 			@FormParam("password") String password) {
-
-		log.debug("email: " + email);
-		log.debug("password: " + password);
 
 		JsonResponse<Map<Enum<ResultConstants>, Object>> response = new JsonResponse<>();
 		response.setSuccess(true);

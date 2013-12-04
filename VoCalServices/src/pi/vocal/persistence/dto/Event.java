@@ -8,6 +8,7 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -58,7 +59,7 @@ public class Event implements Serializable {
 	@GeneratedValue
 	private long eventId;
 	
-	@OneToMany(mappedBy="eventId")
+	@OneToMany(mappedBy="eventId", fetch=FetchType.EAGER)
 	private Set<UserAttendance> userAttendances = new HashSet<>();
 	
 	@ElementCollection(targetClass=Grade.class)

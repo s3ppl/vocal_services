@@ -9,7 +9,6 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 
 import pi.vocal.event.EventType;
 import pi.vocal.management.exception.VocalServiceException;
@@ -111,7 +110,7 @@ public class EventManagement {
 		return eventDto;
 	}
 
-	private static void inviteUsersToEvent(Event event) {
+	private static void inviteUsersToEvent(UUID sessionId, Event event) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 
 		List<User> users;
@@ -133,6 +132,9 @@ public class EventManagement {
 				session.update(event);
 				session.save(userAttendance);
 				session.getTransaction().commit();
+
+				// keep the user object of the current session up to date
+				SessionManagement.updateSessionUser(sessionId, user);
 			}
 		}
 
@@ -188,11 +190,11 @@ public class EventManagement {
 					e);
 		}
 
-		inviteUsersToEvent(event);
+		// invite all users having the according grades
+		inviteUsersToEvent(sessionId, event);
 	}
 
-	@SuppressWarnings("unchecked")
-	public static List<Event> getDateInterval(UUID sessionId, long startDate,
+	public static List<Event> getEventsBetween(UUID sessionId, long startDate,
 			long endDate) throws VocalServiceException {
 
 		User user = SessionManagement.getUserBySessionId(sessionId);
@@ -205,16 +207,25 @@ public class EventManagement {
 			for (UserAttendance ua : user.getUserAttendance()) {
 				session.beginTransaction();
 				event = (Event) session.get(Event.class, ua.getEventId());
-				session.getTransaction().commit();
+
+				logger.debug(event);
 
 				if ((event.getStartDate() >= startDate && event.getStartDate() <= endDate)
 						|| (event.getEndDate() >= startDate && event
-								.getEndDate() <= endDate)) {
-					
+								.getEndDate() <= endDate)
+						|| (event.getStartDate() < startDate && event
+								.getEndDate() > endDate)) {
+
+					logger.debug("adding event with id " + event.getEventId()
+							+ " to result list");
 					events.add(event);
+				} else {
+					logger.debug("skipped event: " + event.getEventId());
 				}
+				
+				session.getTransaction().commit();
 			}
-			
+
 			session.close();
 		} else {
 			logger.warn("No user with the following session id could be found: "

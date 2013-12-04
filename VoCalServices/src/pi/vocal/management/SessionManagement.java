@@ -13,7 +13,6 @@ import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.management.helper.PasswordEncryptionHelper;
 import pi.vocal.management.helper.ResultConstants;
 import pi.vocal.persistence.dto.User;
-import pi.vocal.service.dto.PublicUser;
 
 /**
  * This class handles the login and logout of a user.
@@ -116,8 +115,8 @@ public class SessionManagement {
 	 *             Thrown if either the authentication of the user failed or an
 	 *             internal error occurred.
 	 */
-	public synchronized static Map<Enum<ResultConstants>, Object> login(String email,
-			String password) throws VocalServiceException {
+	public synchronized static Map<Enum<ResultConstants>, Object> login(
+			String email, String password) throws VocalServiceException {
 
 		// make sure the user won't get logged in twice
 		removeAlreadyLoggedInUser(email);
@@ -183,5 +182,21 @@ public class SessionManagement {
 		}
 
 		return sessions.get(id);
+	}
+
+	/**
+	 * Updates an existing user object that is stored in the session
+	 * 
+	 * @param sessionId
+	 *            The sessionId of the user to update
+	 * @param user
+	 *            The user to update
+	 */
+	public synchronized static void updateSessionUser(UUID sessionId, User user) {
+		// check for id existence to avoid 'injection' of any session by any
+		// class
+		if (sessions.containsKey(sessionId)) {
+			sessions.put(sessionId, user);
+		}
 	}
 }
