@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import pi.vocal.event.EventType;
 import pi.vocal.user.SchoolLocation;
 
 @Path("/LocationMgmt")
@@ -33,5 +34,21 @@ public class LocationService {
 		response.setCharacterEncoding("UTF-8");
 
 		return locList;
+	}
+	
+	@GET
+	@Path("/getEventTypes")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Map<EventType, String> getEventTypes() throws UnsupportedEncodingException {
+		Map<EventType, String> eventTypes = new HashMap<EventType, String>();
+
+		for (EventType et : EventType.values()) {
+			eventTypes.put(et, et.getName());
+		}
+		
+		// set encoding to UTF-8 for compatibility
+		response.setCharacterEncoding("UTF-8");
+
+		return eventTypes;
 	}
 }

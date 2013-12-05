@@ -19,7 +19,6 @@ import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.service.dto.JsonResponse;
 import pi.vocal.service.dto.PublicEvent;
-import pi.vocal.service.dto.PublicUser;
 
 @Path("/EventMgmt")
 public class EventService {
@@ -77,6 +76,7 @@ public class EventService {
 		JsonResponse<List<?>> response = new JsonResponse<>();
 		response.setSuccess(true);
 
+		// wrap all events to PublicEvents
 		try {
 			List<PublicEvent> resultEvents = new ArrayList<>();
 			List<Event> internalEvents = EventManagement.getEventsBetween(
