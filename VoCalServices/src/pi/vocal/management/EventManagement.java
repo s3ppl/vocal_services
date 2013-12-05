@@ -17,6 +17,7 @@ import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.persistence.dto.UserAttendance;
 import pi.vocal.user.Grade;
+import pi.vocal.user.Role;
 
 // TODO comment this class
 public class EventManagement {
@@ -162,11 +163,11 @@ public class EventManagement {
 		User user = SessionManagement.getUserBySessionId(sessionId);
 		if (null == user) {
 			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
-		} /*
-		 * else if (user.getRole() != Role.ADMIN && user.getRole() !=
-		 * Role.MANAGER) { throw new
-		 * VocalServiceException(ErrorCode.INVALID_USER_PERMISSIONS); }
-		 */// FIXME uncomment permission checks after testing is done!
+		} else if (user.getRole() != Role.ADMIN
+				&& user.getRole() != Role.MANAGER) {
+			
+			throw new VocalServiceException(ErrorCode.INVALID_USER_PERMISSIONS);
+		}
 
 		Event event = createEventFromInput(title, description, startDate,
 				endDate, type, childrenMayAttend, disciplesMayAttend,
@@ -218,7 +219,7 @@ public class EventManagement {
 				} else {
 					logger.debug("skipped event: " + event.getEventId());
 				}
-				
+
 				session.getTransaction().commit();
 			}
 

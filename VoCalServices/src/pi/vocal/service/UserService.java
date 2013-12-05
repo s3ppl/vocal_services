@@ -145,6 +145,27 @@ public class UserService {
 			return errorResponse;
 		}
 	}
+	
+	@POST
+	@Path("/setEventAttendance")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JsonResponse<List<ErrorCode>> attendEvent(
+			@FormParam("sessionid") UUID sessionId,
+			@FormParam("eventid") long eventId,
+			@FormParam("attends") boolean attends) {
+
+		JsonResponse<List<ErrorCode>> response = new JsonResponse<>();
+		response.setSuccess(true);
+		
+		try {
+			UserManagement.setEventAttendance(sessionId, eventId, attends);
+		} catch (VocalServiceException e) {
+			response.setSuccess(false);
+			response.setContent(e.getErrorCodes());
+		}
+		
+		return response;
+	}
 
 	@GET
 	// @POST

@@ -17,6 +17,7 @@ import pi.vocal.management.helper.PasswordEncryptionHelper;
 import pi.vocal.management.helper.ResultConstants;
 import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.User;
+import pi.vocal.persistence.dto.UserAttendance;
 import pi.vocal.user.Grade;
 import pi.vocal.user.Role;
 import pi.vocal.user.SchoolLocation;
@@ -413,6 +414,31 @@ public class UserManagement {
 		}
 
 		return result;
+	}
+	
+	public static void setEventAttendance(UUID sessionId, long eventId, boolean attends) throws VocalServiceException {
+		User user = SessionManagement.getUserBySessionId(sessionId);
+		
+		if (user != null) {
+			UserAttendance userAttendance = null;
+			for (UserAttendance ua : user.getUserAttendance()) {
+				if (ua.getEventId() == eventId) {
+					userAttendance = ua;
+					ua.setAttends(attends);
+					break;
+				}
+			}
+			
+			if (userAttendance != null) {
+				Session session = HibernateUtil.getSessionFactory().openSession();
+				session.beginTransaction();
+				session.update(userAttendance);
+				session.getTransaction().commit();
+				session.close();
+			}
+		} else {
+			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
+		}
 	}
 
 }
