@@ -10,13 +10,13 @@
 		</layout>
 	</appender>
 
-	<!-- appender name="util" class="org.apache.log4j.FileAppender">
-		<param name="File" value="${catalina.base}/logs" />
+	<appender name="util" class="org.apache.log4j.FileAppender">
+		<param name="File" value="${catalina.home}/logs/vocal.log" />
 		<param name="Append" value="true" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="[%p] %d{dd MMM hh:mm:ss.SSS aa} %t [%c]%n%m%n%n" />
+			<param name="ConversionPattern" value="[%p] %d{dd.MM.yyyy HH:mm:ss.SSS} %t [%c] %m%n%n" />
 		</layout>
-	</appender-->
+	</appender>
 
 	<logger name="pi.vocal">
 		<level value="ALL" />
@@ -26,8 +26,7 @@
 		<level value="info" />
 		<appender-ref ref="default" />
 		
-		<!-- disabled since it does not work within eclipse -->
-		<!-- appender-ref ref="util" /-->
+		<appender-ref ref="util" />
 	</root>
 
 
