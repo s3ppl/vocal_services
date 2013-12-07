@@ -36,7 +36,7 @@ public class UserService {
 	private static final Logger LOGGER = Logger.getLogger(UserService.class);
 
 	/**
-	 * This webservice creates a new user account with the given information.
+	 * This WebService creates a new user account with the given information.
 	 * 
 	 * @param firstName
 	 *            The firstname of the user
@@ -51,7 +51,7 @@ public class UserService {
 	 * @param location
 	 *            The location of the school, the user trains
 	 * @return A list of {@code ErrorCode} which contains all errors, the users
-	 *         input has, like no password.
+	 *         input had, like no password.
 	 */
 	@POST
 	@Path("/createUser")
@@ -90,6 +90,26 @@ public class UserService {
 		return response;
 	}
 
+	/**
+	 * This WebService changes the fields of an existing {@code User} in the
+	 * database. Afterwards the changed {@code User} object will be returned
+	 * within a {@code Map} that is wrapped within a {@code JsonResponse}. Also
+	 * contained in this {@code Map} is a {@code List} of {@code SuccessCode}s
+	 * according to the changes done.
+	 * 
+	 * In case an error occured, a {@code List} of {@code ErrorCode}s will be
+	 * returned within the {@code JsonResponse} instead of the {@code Map}.
+	 * 
+	 * @param sessionId
+	 *            The sessionId of the {@code User} to change
+	 * @param firstName
+	 *            The new firstname of the {@code User}. May be null
+	 * @param lastName
+	 *            The new lastname of the {@code User}. May be null
+	 * @param location
+	 *            The new location of the {@code User}. May be null
+	 * @return
+	 */
 	@POST
 	@Path("/editUser")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -122,6 +142,27 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * Changes the password of an existing {@code User}.
+	 * 
+	 * If the password change is done successfully an according
+	 * {@code SuccessCode} is returned within a {@code JsonResponse}. Otherwise
+	 * the {@code JsonResponse} contains a {@code List} of {@code ErrorCode}s
+	 * that provide information about what went wrong.
+	 * 
+	 * @param sessionId
+	 *            The sessionId of the {@code User} thats password should get
+	 *            changed
+	 * @param oldPassword
+	 *            The current password of the {@code User}
+	 * @param newPassword1
+	 *            The new password of the {@code User}
+	 * @param newPassword2
+	 *            The new password of the {@code User} to detect typos
+	 * @return Either a {@code JsonResponse} containing an {@code SuccessCode}
+	 *         if the change worked or a {@code List} of {@code ErrorCode}s
+	 *         containg information about what went wrong
+	 */
 	@POST
 	@Path("/changeUserPassword")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -145,7 +186,22 @@ public class UserService {
 			return errorResponse;
 		}
 	}
-	
+
+	/**
+	 * Sets the attendance of a {@code User} at a given {@code Event}.
+	 * 
+	 * @param sessionId
+	 *            The sessionId of the {@code User} that wants to change is
+	 *            {@code Event} attendance
+	 * @param eventId
+	 *            The id of the {@code Event} the {@code User} wants to change
+	 *            his attendance for
+	 * @param attends
+	 *            Either {@code true} if the {@code User} wants to attend or
+	 *            {@code false} if not
+	 * @return Returns a {@code List} of {@code ErrorCode} if anything went
+	 *         wrong while trying to change the attendance of the {@code User}
+	 */
 	@POST
 	@Path("/setEventAttendance")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -156,14 +212,14 @@ public class UserService {
 
 		JsonResponse<List<ErrorCode>> response = new JsonResponse<>();
 		response.setSuccess(true);
-		
+
 		try {
 			UserManagement.setEventAttendance(sessionId, eventId, attends);
 		} catch (VocalServiceException e) {
 			response.setSuccess(false);
 			response.setContent(e.getErrorCodes());
 		}
-		
+
 		return response;
 	}
 
@@ -172,7 +228,7 @@ public class UserService {
 	@Path("/deleteUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<List<?>> deleteAccount() {
-		// TODO implement me!
+		// TODO implement me! (deleteUser)
 		return null;
 	}
 

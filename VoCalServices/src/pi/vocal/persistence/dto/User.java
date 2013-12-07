@@ -65,7 +65,7 @@ public class User implements Serializable {
 	private Role role;
 
 	@OneToMany(mappedBy = "userId", fetch = FetchType.EAGER)
-	private Set<UserAttendance> userAttendances;
+	private Set<UserAttendance> userAttendances = new HashSet<>();
 
 	public long getUserId() {
 		return userId;
@@ -144,10 +144,6 @@ public class User implements Serializable {
 	}
 
 	public void addUserAttendance(UserAttendance userAttendance) {
-		if (null == this.userAttendances) {
-			this.userAttendances = new HashSet<>();
-		}
-
 		this.userAttendances.add(userAttendance);
 	}
 

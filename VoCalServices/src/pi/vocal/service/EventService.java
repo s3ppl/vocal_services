@@ -1,6 +1,7 @@
 package pi.vocal.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +23,6 @@ import pi.vocal.service.dto.PublicEvent;
 
 @Path("/EventMgmt")
 public class EventService {
-
 	private final static Logger logger = Logger.getLogger(EventService.class);
 
 	@POST
@@ -73,6 +73,31 @@ public class EventService {
 //	public JsonResponse<List<?>> editEvent() {
 //		
 //	}
+	
+	@POST
+	@Path("/getEventsById")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JsonResponse<?> getEventById(UUID sessionId, long eventId) {
+		
+		// get persistent event according to the 
+		Event persistentEvent = EventManagement.getEventById(eventId);
+		
+		if (null != persistentEvent) {
+			JsonResponse<PublicEvent> response = new JsonResponse<>();
+			response.setSuccess(true);
+			
+			PublicEvent publicEvent = new PublicEvent(persistentEvent);
+			response.setContent(publicEvent);
+			
+			return response;
+		} else {
+			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
+			errorResponse.setSuccess(false);
+			errorResponse.setContent(Arrays.asList(ErrorCode.INVALID_EVENT_ID));
+			
+			return errorResponse;
+		}
+	}
 	
 	@POST
 	@Path("/getEventsBetween")

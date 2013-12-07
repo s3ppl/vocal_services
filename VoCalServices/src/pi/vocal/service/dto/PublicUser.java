@@ -4,16 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import pi.vocal.event.EventType;
 import pi.vocal.management.EventManagement;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.persistence.dto.UserAttendance;
 import pi.vocal.user.Grade;
-import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
+import pi.vocal.user.SchoolLocation;
 
 /**
  * This class is the public representation of a {@code User}. It is used by the
@@ -28,8 +26,6 @@ import pi.vocal.user.Role;
  * 
  */
 public class PublicUser {
-	private static final Logger logger = Logger.getLogger(PublicEvent.class);
-	
 	private String firstName;
 	private String lastName;
 	private String email;

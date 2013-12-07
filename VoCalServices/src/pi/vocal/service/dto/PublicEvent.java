@@ -4,43 +4,59 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import pi.vocal.event.EventType;
 import pi.vocal.management.UserManagement;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.persistence.dto.UserAttendance;
 import pi.vocal.user.Grade;
-import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
+import pi.vocal.user.SchoolLocation;
 
-public class PublicEvent {	
+/**
+ * JavaBean like class that represents a {@code User} to the public. Therefore
+ * it contains the same fields as the persistent {@code User} does except for his
+ * password and without a circular relation with his events. Therefore a nested
+ * event class is used (see below).
+ * 
+ * @author s3ppl
+ * 
+ */
+public class PublicEvent {
 	private long startDate;
 	private long endDate;
-	
+
 	private String title;
 	private String description;
-	
-	private EventType eventType; 
+
+	private EventType eventType;
 
 	private long eventId;
-	
-	private List<EventUser> attendants = new ArrayList<EventUser>();
-	
-	public PublicEvent() {}
 
+	private List<EventUser> attendants = new ArrayList<EventUser>();
+
+	/**
+	 * Default constructor is needed by the framework Jackson for being able to
+	 * parse this class as JSON.
+	 */
+	public PublicEvent() {
+	}
+
+	/**
+	 * Copies all needed information of the given {@code Event} and transforms the 
+	 * @param event
+	 */
 	public PublicEvent(Event event) {
 		this.startDate = event.getStartDate();
 		this.endDate = event.getEndDate();
-		
+
 		this.title = event.getTitle();
 		this.description = event.getDescription();
-		
+
 		this.eventType = event.getEventType();
-		
+
 		this.eventId = event.getEventId();
-		
+
 		this.setAttendants(event.getUserAttendance());
 	}
 
@@ -91,17 +107,17 @@ public class PublicEvent {
 	public void setEventId(long eventId) {
 		this.eventId = eventId;
 	}
-	
+
 	public List<EventUser> getAttendants() {
 		return attendants;
 	}
-	
+
 	public void setAttendants(Set<UserAttendance> userAttendances) {
 		EventUser attendant = null;
 		User user = null;
 		for (UserAttendance userAttendance : userAttendances) {
 			user = UserManagement.getUserById(userAttendance.getUserId());
-			
+
 			attendant = new EventUser();
 			attendant.setEmail(user.getEmail());
 			attendant.setFirstName(user.getFirstName());
@@ -109,19 +125,19 @@ public class PublicEvent {
 			attendant.setLastName(user.getLastName());
 			attendant.setRole(user.getRole());
 			attendant.setSchoolLocation(user.getSchoolLocation());
-			
+
 			this.attendants.add(attendant);
 		}
 	}
-	
+
 	class EventUser {
 		private String firstName;
 		private String lastName;
 		private String email;
-		
+
 		private SchoolLocation schoolLocation;
 		private Grade grade;
-		
+
 		private Role role;
 
 		public String getFirstName() {
@@ -170,6 +186,6 @@ public class PublicEvent {
 
 		public void setRole(Role role) {
 			this.role = role;
-		}		
+		}
 	}
 }

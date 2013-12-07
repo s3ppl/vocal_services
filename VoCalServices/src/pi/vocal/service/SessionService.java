@@ -20,10 +20,29 @@ import pi.vocal.persistence.dto.User;
 import pi.vocal.service.dto.JsonResponse;
 import pi.vocal.service.dto.PublicUser;
 
+/**
+ * This class is a WebService, that provides login and logout functions. All
+ * functions need their parameters given within a HTTP POST request.
+ * 
+ * @author s3ppl
+ * 
+ */
 @Path("/SessionMgmt")
 public class SessionService {
 	private static final Logger logger = Logger.getLogger(SessionService.class);
 
+	/**
+	 * Logs a {@code User} into the system and returns a {@code Map} containing
+	 * the {@code PublicUser} object and a sessionId. In case an error occurs,
+	 * the {@code Map} is replaced by a {@code List} of {@code ErrorCode}s.
+	 * 
+	 * @param email
+	 *            The email of the {@code User} needed for the login
+	 * @param password
+	 *            The password of the {@code User} needed for the login
+	 * @return Either a {@code Map} with the according {@code User} object and a
+	 *         sessionId or a {@code List} of {@code ErrorCodes}
+	 */
 	@POST
 	@Path("/login")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -40,20 +59,15 @@ public class SessionService {
 					(User) result.get(ResultConstants.LOGIN_USER_KEY)));
 			response.setContent(result);
 		} catch (Exception e) { // TODO keep as exception!?
-			// if (e.getErrorCodes().size() == 1
-			// && e.getErrorCodes().get(0) == ErrorCode.INTERNAL_ERROR) {
-			//
-			// log.error(
-			// "Login failed. See nested exceptions for further detail." +
-			// e.getStackTrace());
-			// }
-
 			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
 			errorResponse.setSuccess(false);
 
-			if (e instanceof VocalServiceException)
+			if (e instanceof VocalServiceException) {
 				errorResponse.setContent(((VocalServiceException) e)
 						.getErrorCodes());
+			} else {
+				logger.error("Unexpected Exception!", e);
+			}
 
 			return errorResponse;
 		}
@@ -61,6 +75,12 @@ public class SessionService {
 		return response;
 	}
 
+	/**
+	 * Logs a {@code User} out of the system and deletes his session.
+	 * 
+	 * @param id
+	 *            The id of the session for the {@code User} to logout
+	 */
 	@POST
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON)

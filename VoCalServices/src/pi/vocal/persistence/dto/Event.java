@@ -130,11 +130,7 @@ public class Event implements Serializable {
 		this.attendantsGrades.add(grade);
 	}
 	
-	public void addUserAttendance(UserAttendance userAttendances) {
-		if (null == this.userAttendances) {
-			this.userAttendances = new HashSet<>();
-		}
-		
+	public void addUserAttendance(UserAttendance userAttendances) {	
 		this.userAttendances.add(userAttendances);
 	}
 }
