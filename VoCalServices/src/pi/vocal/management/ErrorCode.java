@@ -27,6 +27,7 @@ public enum ErrorCode {
 	// misc
 	INTERNAL_ERROR,
 	INVALID_USER_ID,
+	INVALID_EVENT_ID,
 	
 	// login errors
 	AUTHENTICATION_FAILED;

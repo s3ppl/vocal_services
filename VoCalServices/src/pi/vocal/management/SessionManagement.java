@@ -118,6 +118,8 @@ public class SessionManagement {
 	public synchronized static Map<Enum<ResultConstants>, Object> login(
 			String email, String password) throws VocalServiceException {
 
+		logger.debug("[LOGIN] " + email + " " + password);
+		
 		// make sure the user won't get logged in twice
 		removeAlreadyLoggedInUser(email);
 
@@ -149,6 +151,8 @@ public class SessionManagement {
 		// add the users session
 		UUID sessionId = generateSessionId();
 		sessions.put(sessionId, user);
+		
+		logger.debug("[LOGIN]: logged in user: " + user.getEmail() + " and sessionID: " + sessionId);
 
 		result.put(ResultConstants.LOGIN_USER_KEY, user);
 		result.put(ResultConstants.LOGIN_SESSIONID_KEY, sessionId);
@@ -163,7 +167,9 @@ public class SessionManagement {
 	 *            The session id of the user to log out.
 	 */
 	public synchronized static void logout(UUID sessionId) {
-		if (null != sessionId) {
+		if (null != sessionId && sessions.containsKey(sessionId)) {
+			logger.debug("id: " + sessionId + " logged out");
+			
 			sessions.remove(sessionId);
 		}
 	}
@@ -181,6 +187,12 @@ public class SessionManagement {
 			return null;
 		}
 
+		logger.debug(id);
+		
+		User user = sessions.get(id);
+		
+		logger.debug("[GETUSERNYSESSIONID]" + user.getEmail());
+		
 		return sessions.get(id);
 	}
 

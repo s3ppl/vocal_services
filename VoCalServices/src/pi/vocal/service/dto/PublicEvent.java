@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import pi.vocal.event.EventType;
 import pi.vocal.management.UserManagement;
 import pi.vocal.persistence.dto.Event;
@@ -13,7 +15,7 @@ import pi.vocal.user.Grade;
 import pi.vocal.user.SchoolLocation;
 import pi.vocal.user.Role;
 
-public class PublicEvent {
+public class PublicEvent {	
 	private long startDate;
 	private long endDate;
 	
@@ -39,7 +41,7 @@ public class PublicEvent {
 		
 		this.eventId = event.getEventId();
 		
-		this.setAttendents(event.getUserAttendance());
+		this.setAttendants(event.getUserAttendance());
 	}
 
 	public long getStartDate() {
@@ -90,11 +92,11 @@ public class PublicEvent {
 		this.eventId = eventId;
 	}
 	
-	public List<EventUser> getAttendents() {
+	public List<EventUser> getAttendants() {
 		return attendants;
 	}
 	
-	public void setAttendents(Set<UserAttendance> userAttendances) {
+	public void setAttendants(Set<UserAttendance> userAttendances) {
 		EventUser attendant = null;
 		User user = null;
 		for (UserAttendance userAttendance : userAttendances) {

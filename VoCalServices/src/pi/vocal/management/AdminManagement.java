@@ -17,9 +17,9 @@ public class AdminManagement {
 
 		if (null == admin) {
 			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
-		} else if (admin.getRole() != Role.ADMIN) {
+		}/* else if (admin.getRole() != Role.ADMIN) {
 			throw new VocalServiceException(ErrorCode.INVALID_USER_PERMISSIONS);
-		}
+		}*/
 	}
 
 	private static List<User> getAllUsersFromDatabase() {

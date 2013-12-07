@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
@@ -22,7 +24,17 @@ import pi.vocal.user.Grade;
 import pi.vocal.user.Role;
 import pi.vocal.user.SchoolLocation;
 
+/**
+ * The UserManagement contains all functions to work on persistent users, like
+ * createUser.
+ * 
+ * @author s3ppl
+ * 
+ */
+
 public class UserManagement {
+
+	private static final Logger logger = Logger.getLogger(UserManagement.class);
 
 	// TODO add logging
 
@@ -63,12 +75,26 @@ public class UserManagement {
 		return user;
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Searches the database for all users that have the given grade.
+	 * 
+	 * @param grade
+	 *            The grade the users should have
+	 * @return A {@code List} of {@code User}s that have the given grade
+	 */
 	public static List<User> getUsersByGrade(Grade grade) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
-		List<User> result = session.createCriteria(User.class)
-				.add(Restrictions.eq("grade", grade)).list();
+
+		Query query = session
+				.createSQLQuery("select * from user u where u.grade = :grade")
+				.addEntity(User.class).setParameter("grade", grade.ordinal());
+		
+		@SuppressWarnings("unchecked")
+		List<User> result = query.list();
+
+		logger.debug(result.size());
+
 		session.getTransaction().commit();
 		session.close();
 
@@ -241,22 +267,16 @@ public class UserManagement {
 
 		Session session = null;
 		try {
-			session = HibernateUtil.getSessionFactory().openSession();
-
 			User userDto = createUserFromUserInput(firstName, lastName, email,
 					grade, schoolLocation, password);
 
+			session = HibernateUtil.getSessionFactory().openSession();
 			session.beginTransaction();
 			session.save(userDto);
 			session.getTransaction().commit();
+			session.flush();
 			session.close();
 		} catch (HibernateException he) {
-			// if (null != session && session.isOpen()
-			// && null != session.getTransaction()) {
-			//
-			// session.getTransaction().rollback();
-			// }
-
 			throw new VocalServiceException(
 					ErrorCode.INTERNAL_ERROR,
 					"Could not create Account. Storing to the database failed. See nested Exception for further details.",
@@ -323,6 +343,7 @@ public class UserManagement {
 				session.beginTransaction();
 				session.update(user);
 				session.getTransaction().commit();
+				session.flush();
 				session.close();
 			} catch (NoSuchAlgorithmException | InvalidKeySpecException
 					| HibernateException e) {
@@ -340,9 +361,8 @@ public class UserManagement {
 	 * 
 	 * @param id
 	 *            The id of the user to find
-	 * @return The PublicUser object of the user according to the given id
+	 * @return The {@code User} object of the user according to the given id
 	 */
-	// TODO change comment!
 	public static User getUserById(long id) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
@@ -402,8 +422,9 @@ public class UserManagement {
 			session.beginTransaction();
 			session.update(user);
 			session.getTransaction().commit();
+			session.flush();
 			session.close();
-			
+
 			// keep the user object of the session up to date
 			SessionManagement.updateSessionUser(sessionId, user);
 
@@ -415,10 +436,25 @@ public class UserManagement {
 
 		return result;
 	}
-	
-	public static void setEventAttendance(UUID sessionId, long eventId, boolean attends) throws VocalServiceException {
+
+	/**
+	 * Sets the attendance of a {@code User} to an {@code Event}.
+	 * 
+	 * @param sessionId
+	 *            The sessionId of the {@code User}
+	 * @param eventId
+	 *            The id of the {@code Event} the user wants to set his
+	 *            attendance of//TODO is 'of' the correct word?
+	 * @param attends
+	 *            Should be {@code true} if the {@code User} want to attend to
+	 *            the {@code Event}; {@code false} otherwise
+	 * @throws VocalServiceException
+	 *             Thrown if the given sessionId could not be found
+	 */
+	public static void setEventAttendance(UUID sessionId, long eventId,
+			boolean attends) throws VocalServiceException {
 		User user = SessionManagement.getUserBySessionId(sessionId);
-		
+
 		if (user != null) {
 			UserAttendance userAttendance = null;
 			for (UserAttendance ua : user.getUserAttendance()) {
@@ -428,12 +464,14 @@ public class UserManagement {
 					break;
 				}
 			}
-			
+
 			if (userAttendance != null) {
-				Session session = HibernateUtil.getSessionFactory().openSession();
+				Session session = HibernateUtil.getSessionFactory()
+						.openSession();
 				session.beginTransaction();
 				session.update(userAttendance);
 				session.getTransaction().commit();
+				session.flush();
 				session.close();
 			}
 		} else {

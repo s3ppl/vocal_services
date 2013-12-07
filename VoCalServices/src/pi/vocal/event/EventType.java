@@ -5,7 +5,8 @@ public enum EventType {
 	DEMO("Vorführung"),
 	SEMINAR("Lehrgang"),
 	COMPETITION("Wettkampf"),
-	MEETING("Treffen");
+	MEETING("Treffen"),
+	NOT_SELECTED(null);
 
 	private String name;
 

@@ -2,10 +2,19 @@ package pi.vocal.management;
 
 public enum SuccessCode {
 
-	// account creation errors
+	// change user codes
 	PASSWORD_CHANGED,
 	FIRSTNAME_CHANGED,
 	LASTNAME_CHANGED,
 	GRADE_CHANGED,
-	SCHOOL_LOCATION_CHANGED;
+	SCHOOL_LOCATION_CHANGED,
+	
+	//change event codes
+	TITLE_CHANGED,
+	DESCRIPTION_CHANGED,
+//	STARTDATE_CHANGED, // change to period?
+//	ENDDATE_CHANGED,
+	PERIOD_CHANGED,
+	EVENTTYPE_CHANGED,
+	ATTENDANCE_GRADES_CHANGED;
 }

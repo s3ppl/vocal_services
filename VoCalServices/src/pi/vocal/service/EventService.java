@@ -44,6 +44,8 @@ public class EventService {
 		response.setSuccess(true);
 
 		List<ErrorCode> errors = null;
+		
+		logger.debug("desc.: " + description);
 
 		try {
 			EventManagement.createEvent(sessionId, title, description,
@@ -65,6 +67,13 @@ public class EventService {
 		return response;
 	}
 
+//	@POST
+//	@Path("/editEvent")
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public JsonResponse<List<?>> editEvent() {
+//		
+//	}
+	
 	@POST
 	@Path("/getEventsBetween")
 	@Produces(MediaType.APPLICATION_JSON)
