@@ -21,6 +21,8 @@ import pi.vocal.persistence.dto.Event;
 import pi.vocal.service.dto.JsonResponse;
 import pi.vocal.service.dto.PublicEvent;
 
+// TODO comment me
+
 @Path("/EventMgmt")
 public class EventService {
 	private final static Logger logger = Logger.getLogger(EventService.class);

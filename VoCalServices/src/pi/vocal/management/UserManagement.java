@@ -33,7 +33,6 @@ import pi.vocal.user.SchoolLocation;
  */
 
 public class UserManagement {
-
 	private static final Logger logger = Logger.getLogger(UserManagement.class);
 
 	// TODO add logging
@@ -89,11 +88,9 @@ public class UserManagement {
 		Query query = session
 				.createSQLQuery("select * from user u where u.grade = :grade")
 				.addEntity(User.class).setParameter("grade", grade.ordinal());
-		
+
 		@SuppressWarnings("unchecked")
 		List<User> result = query.list();
-
-		logger.debug(result.size());
 
 		session.getTransaction().commit();
 		session.close();
@@ -117,34 +114,43 @@ public class UserManagement {
 
 		if (null == user.getFirstName() || user.getFirstName().isEmpty()) {
 			errorCodes.add(ErrorCode.FIRSTNAME_MISSING);
+			logger.warn("No firstname specified!");
 		}
 
 		if (null == user.getLastName() || user.getLastName().isEmpty()) {
 			errorCodes.add(ErrorCode.LASTNAME_MISSING);
+			logger.warn("No lastname specified!");
 		}
 
 		if (null == user.getGrade() || user.getGrade() == Grade.NOT_SELECTED) {
 			errorCodes.add(ErrorCode.GRADE_MISSING);
+			logger.warn("No grade selected!");
 		}
 
 		if (null == user.getSchoolLocation()
 				|| user.getSchoolLocation() == SchoolLocation.NOT_SELECTED) {
 
 			errorCodes.add(ErrorCode.SCHOOL_LOCATION_MISSING);
+			logger.warn("No school location selected!");
 		}
 
 		if (null == password || password.isEmpty()) {
 			errorCodes.add(ErrorCode.PASSWORD_MISSING);
+			logger.warn("No password specified!");
 		} else if (password.length() < MIN_PW_LEN) {
 			errorCodes.add(ErrorCode.PASSWORD_TOO_SHORT);
+			logger.warn("Given password was too short!");
 		}
 
 		if (null == user.getEmail() || user.getEmail().isEmpty()) {
 			errorCodes.add(ErrorCode.EMAIL_MISSING);
+			logger.warn("No email specified!");
 		} else if (!user.getEmail().matches(EMAIL_MATCH_STRING)) {
 			errorCodes.add(ErrorCode.EMAIL_INVALID);
+			logger.warn("Given email was invalid!");
 		} else if (null != getUserByEmail(user.getEmail())) {
 			errorCodes.add(ErrorCode.EMAIL_ALREADY_IN_USE);
+			logger.warn("Email given is already in use!");
 		}
 
 		return errorCodes;
@@ -176,6 +182,7 @@ public class UserManagement {
 			SchoolLocation schoolLocation, String password)
 			throws VocalServiceException {
 
+		// create user object from given input
 		User userDto = new User();
 		userDto.setFirstName(firstName);
 		userDto.setLastName(lastName);
@@ -185,6 +192,7 @@ public class UserManagement {
 		userDto.setSchoolLocation(schoolLocation);
 		userDto.addUserAttendance(null);
 
+		// check validity of the given input stored in the user object
 		List<ErrorCode> errorCodes = verifyUserInput(userDto, password);
 
 		// if any value was invalid, throw an exception containing the errors
@@ -193,8 +201,8 @@ public class UserManagement {
 					"Account creation failed due to invalid user input.");
 		}
 
-		// create and set password hash and salt
 		try {
+			// create and set password hash and salt
 			byte[] pwSalt = PasswordEncryptionHelper.generateSalt();
 			byte[] encryptedPw = PasswordEncryptionHelper.getEncryptedPassword(
 					password, pwSalt);

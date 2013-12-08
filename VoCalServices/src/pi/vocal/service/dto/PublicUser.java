@@ -123,10 +123,10 @@ public class PublicUser {
 	public void setEvents(Set<UserAttendance> attendedEvents) {
 		UserEvent userEvent = null;
 		Event event = null;
-		
+
 		for (UserAttendance ua : attendedEvents) {
 			event = EventManagement.getEventById(ua.getEventId());
-			
+
 			userEvent = new UserEvent();
 			userEvent.setDescription(event.getDescription());
 			userEvent.setEndDate(event.getEndDate());
@@ -134,14 +134,15 @@ public class PublicUser {
 			userEvent.setEventType(event.getEventType());
 			userEvent.setStartDate(event.getStartDate());
 			userEvent.setTitle(event.getTitle());
-			
+
 			this.userEvents.add(userEvent);
-		}		
+		}
 	}
 
 	/**
 	 * This class is the same as the persistent {@code Event} except for its
-	 * user list to avoid cyclic dependencies while being parsed by Jackson.
+	 * {@code UserAttendance}s to avoid cyclic dependencies while being parsed
+	 * by Jackson.
 	 * 
 	 * @author s3ppl
 	 * 

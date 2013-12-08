@@ -14,6 +14,8 @@ import javax.ws.rs.core.MediaType;
 import pi.vocal.event.EventType;
 import pi.vocal.user.SchoolLocation;
 
+// TODO comment me!
+
 @Path("/LocationMgmt")
 public class LocationService {
 

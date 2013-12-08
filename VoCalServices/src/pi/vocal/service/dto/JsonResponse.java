@@ -1,16 +1,17 @@
 package pi.vocal.service.dto;
 
 /**
- * Wrapper class that are used by JSON webservices. This class will be mapped by
- * jackson, therefore it has to be a POJO class
+ * Wrapper class that are used by JSON WebService. This class will be mapped by
+ * the framework Jackson, therefore it has to be a JavaBean-like class
  * 
  * @author s3ppl
  * 
- * @param <T> Type of the content the response should hold
+ * @param <T>
+ *            Type of the content the response should hold
  */
 public class JsonResponse<T> {
 
-	// json has no boolean, therefore C-like integers will be used
+	// JSON has no boolean, therefore C-like integers will be used
 	private static final int JSON_TRUE = 1;
 	private static final int JSON_FALSE = 0;
 
@@ -29,8 +30,13 @@ public class JsonResponse<T> {
 		return success;
 	}
 
+/**
+	 * Sets the value of {@code success} to the given value by converting the
+	 * {@code boolean) value to its JSON representation.
+	 * 
+	 * @param isSuccessful
+	 */
 	public void setSuccess(boolean isSuccessful) {
-		// mapping from boolean to json
 		this.success = isSuccessful ? JSON_TRUE : JSON_FALSE;
 	}
 

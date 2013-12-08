@@ -103,7 +103,7 @@ public class SessionManagement {
 	}
 
 	/**
-	 * Handles the login of user.
+	 * Handles the login of user. Therefore a unique session id will be created.
 	 * 
 	 * @param email
 	 *            The email address of the user
@@ -119,7 +119,7 @@ public class SessionManagement {
 			String email, String password) throws VocalServiceException {
 
 		logger.debug("[LOGIN] " + email + " " + password);
-		
+
 		// make sure the user won't get logged in twice
 		removeAlreadyLoggedInUser(email);
 
@@ -131,11 +131,12 @@ public class SessionManagement {
 			boolean success = false;
 
 			if (null != user) {
+				
+				// convert the users password and try to authenticate
 				byte[] userPwHash = PasswordEncryptionHelper
 						.convertFromBase64(user.getPwHash());
 				byte[] userPwSalt = PasswordEncryptionHelper
 						.convertFromBase64(user.getPwSalt());
-
 				success = PasswordEncryptionHelper.authenticate(password,
 						userPwHash, userPwSalt);
 			}
@@ -151,8 +152,9 @@ public class SessionManagement {
 		// add the users session
 		UUID sessionId = generateSessionId();
 		sessions.put(sessionId, user);
-		
-		logger.debug("[LOGIN]: logged in user: " + user.getEmail() + " and sessionID: " + sessionId);
+
+		logger.debug("[LOGIN] A user logged in: " + user.getEmail()
+				+ ". Given sessionId is: " + sessionId);
 
 		result.put(ResultConstants.LOGIN_USER_KEY, user);
 		result.put(ResultConstants.LOGIN_SESSIONID_KEY, sessionId);
@@ -168,8 +170,8 @@ public class SessionManagement {
 	 */
 	public synchronized static void logout(UUID sessionId) {
 		if (null != sessionId && sessions.containsKey(sessionId)) {
-			logger.debug("id: " + sessionId + " logged out");
-			
+			logger.debug("[LOGOUT] sessionId: " + sessionId);
+
 			sessions.remove(sessionId);
 		}
 	}
@@ -187,12 +189,6 @@ public class SessionManagement {
 			return null;
 		}
 
-		logger.debug(id);
-		
-		User user = sessions.get(id);
-		
-		logger.debug("[GETUSERNYSESSIONID]" + user.getEmail());
-		
 		return sessions.get(id);
 	}
 
@@ -205,10 +201,11 @@ public class SessionManagement {
 	 *            The user to update
 	 */
 	public synchronized static void updateSessionUser(UUID sessionId, User user) {
-		// check for id existence to avoid 'injection' of any session by any
-		// class
+		// check for id existence to ensure 'overwrite only'
 		if (sessions.containsKey(sessionId)) {
 			sessions.put(sessionId, user);
+			
+			logger.debug("[UPDATE USER] updated user with sessionId" + sessionId);
 		}
 	}
 }

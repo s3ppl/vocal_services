@@ -15,9 +15,9 @@ import pi.vocal.user.SchoolLocation;
 
 /**
  * JavaBean like class that represents a {@code User} to the public. Therefore
- * it contains the same fields as the persistent {@code User} does except for his
- * password and without a circular relation with his events. Therefore a nested
- * event class is used (see below).
+ * it contains the same fields as the persistent {@code User} does except for
+ * his password and without a circular relation with his events. Therefore a
+ * nested event class is used (see below).
  * 
  * @author s3ppl
  * 
@@ -43,8 +43,12 @@ public class PublicEvent {
 	}
 
 	/**
-	 * Copies all needed information of the given {@code Event} and transforms the 
+	 * Copies all needed information of the given {@code Event} and transforms
+	 * the contained {@code UserAttendance}s to {@code EventUser}s.
+	 * 
 	 * @param event
+	 *            The {@code Event} object thats fields should be copied to this
+	 *            object.
 	 */
 	public PublicEvent(Event event) {
 		this.startDate = event.getStartDate();
@@ -112,6 +116,13 @@ public class PublicEvent {
 		return attendants;
 	}
 
+	/**
+	 * Search all attending {@code User}s of this {@code PublicEvent} and
+	 * convert them to a {@code EventUser}.
+	 * 
+	 * @param userAttendances
+	 *            The {@code UserAttendance}s of an {@code Event}
+	 */
 	public void setAttendants(Set<UserAttendance> userAttendances) {
 		EventUser attendant = null;
 		User user = null;
@@ -130,6 +141,15 @@ public class PublicEvent {
 		}
 	}
 
+	/**
+	 * This class is used by the {@code PublicEvent} and represents a
+	 * {@code User} attending this {@code PublicEvent}. This class is mainly
+	 * needed to remove the circular relation between {@code User}s and
+	 * {@code Event}s.
+	 * 
+	 * @author s3ppl
+	 * 
+	 */
 	class EventUser {
 		private String firstName;
 		private String lastName;

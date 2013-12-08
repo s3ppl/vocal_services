@@ -23,22 +23,35 @@ import pi.vocal.user.Grade;
 import pi.vocal.user.Role;
 
 /**
- * 
+ * This class contains all functions needed to manage {@code Event}s. Most of
+ * its functions are for being used by a WebService.
  * 
  * @author s3ppl
  * 
  */
-
-// TODO comment this class
 public class EventManagement {
 	private final static Logger logger = Logger
 			.getLogger(EventManagement.class);
 
+	/**
+	 * Private constructor since all methods are static.
+	 */
 	private EventManagement() {
 	}
 
+	/**
+	 * Checks the validity of the fields of the given {@code Event}. All errors
+	 * that were found will be returned as a {@code List} of {@code ErrorCode}s.
+	 * 
+	 * @param event
+	 *            The {@code Event} to check
+	 * @return Returns a {@code List} of {@code ErrorCode} containing all found
+	 *         violations
+	 */
 	private static List<ErrorCode> verifyEventInput(Event event) {
 		List<ErrorCode> errors = new ArrayList<>();
+
+		logger.info("Verifying event with title: " + event.getTitle());
 
 		if (null == event.getTitle() || event.getTitle().isEmpty()) {
 			errors.add(ErrorCode.TITLE_MISSING);
@@ -69,6 +82,25 @@ public class EventManagement {
 		return errors;
 	}
 
+	/**
+	 * Creates a {@code Set} of {@code Grade}s that contains all {@code Grade}s
+	 * that are marked as {@code true}.
+	 * 
+	 * @param childrenMayAttend
+	 *            Should be {@code true} if {@code Grade.CHILD} should be added
+	 *            to the {@code Set}
+	 * @param disciplesMayAttend
+	 *            Should be {@code true} if {@code Grade.DISCIPLE} should be
+	 *            added to the {@code Set}
+	 * @param trainersMayAttend
+	 *            Should be {@code true} if {@code Grade.TRAINER} should be
+	 *            added to the {@code Set}
+	 * @param mastersMayAttend
+	 *            Should be {@code true} if {@code Grade.MASTER} should be added
+	 *            to the {@code Set}
+	 * @return Returns a {@code Set} of {@code Grade}s that were marked as
+	 *         {@code true}
+	 */
 	private static Set<Grade> createSetOfAttendanceGrades(
 			boolean childrenMayAttend, boolean disciplesMayAttend,
 			boolean trainersMayAttend, boolean mastersMayAttend) {
@@ -94,12 +126,43 @@ public class EventManagement {
 		return attendanceGrades;
 	}
 
+	/**
+	 * Creates a {@code Event} object using the given input. Afterwards the
+	 * given input gets verified.
+	 * 
+	 * @param title
+	 *            The title of the {@code Event} to create
+	 * @param description
+	 *            The description of the {@code Event} to create. May be null
+	 * @param startDate
+	 *            The startDate of the {@code Event} to create
+	 * @param endDate
+	 *            The endDate of the {@code Event} to create
+	 * @param type
+	 *            The {@code EventType} of the {@code Event} to create
+	 * @param childrenMayAttend
+	 *            should be {@code true} if children may attend this
+	 *            {@code Event}
+	 * @param disciplesMayAttend
+	 *            should be {@code true} if disciples may attend this
+	 *            {@code Event}
+	 * @param trainersMayAttend
+	 *            should be {@code true} if trainers may attend this
+	 *            {@code Event}
+	 * @param mastersMayAttend
+	 *            should be {@code true} if masters may attend this
+	 *            {@code Event}
+	 * @return A newly created {@code Event} object from the given input
+	 * @throws VocalServiceException
+	 *             Thrown if the verification of the given input fails
+	 */
 	private static Event createEventFromInput(String title, String description,
 			Long startDate, Long endDate, EventType type,
 			boolean childrenMayAttend, boolean disciplesMayAttend,
 			boolean trainersMayAttend, boolean mastersMayAttend)
 			throws VocalServiceException {
 
+		// create event object from the given input
 		Event eventDto = new Event();
 		eventDto.setTitle(title);
 		eventDto.setDescription(description);
@@ -113,6 +176,7 @@ public class EventManagement {
 
 		List<ErrorCode> errorCodes = verifyEventInput(eventDto);
 
+		// if any error occurred, throw an exception
 		if (null != errorCodes && errorCodes.size() > 0) {
 			throw new VocalServiceException(errorCodes,
 					"Event creation failed due to invalid input.");
@@ -121,6 +185,14 @@ public class EventManagement {
 		return eventDto;
 	}
 
+	/**
+	 * Invites all {@code User}s in the database that are having a {@code Grade}
+	 * contained in the given {@code Event} by adding an according
+	 * {@code UserAttendance} to them.
+	 * 
+	 * @param event
+	 *            The {@code Event} the {@code User}s should be invited to
+	 */
 	private static void inviteUsersToEvent(Event event) {
 		List<User> users = null;
 		UserAttendance userAttendance = null;
@@ -128,6 +200,8 @@ public class EventManagement {
 		for (Grade grade : event.getAttendantsGrades()) {
 			users = UserManagement.getUsersByGrade(grade);
 
+			// create a new UserAttendance object for each user with an
+			// according grade
 			for (User user : users) {
 				userAttendance = new UserAttendance();
 				userAttendance.setAttends(false);
@@ -137,6 +211,8 @@ public class EventManagement {
 				user.addUserAttendance(userAttendance);
 				event.addUserAttendance(userAttendance);
 
+				// persist the UserAttendance and update the references of the
+				// event and the current user
 				Session session = HibernateUtil.getSessionFactory()
 						.openSession();
 				session.beginTransaction();
@@ -146,15 +222,20 @@ public class EventManagement {
 				session.getTransaction().commit();
 				session.flush();
 				session.close();
-				
-				logger.debug("user has " + user.getUserAttendance().size() + " events");
 			}
 		}
 	}
 
-	private static boolean userHasPermission(User user)
-			throws VocalServiceException {
-
+	/**
+	 * Checks a {@code User} for having the correct permissions to manage an
+	 * {@code Event}.
+	 * 
+	 * @param user
+	 *            The {@code User} object to check
+	 * @return Returns {@code true} if the {@code User} has the permissions to
+	 *         manage {@code Event}s; false is returned otherwise
+	 */
+	private static boolean userHasPermission(User user) {
 		if (user.getRole() != Role.ADMIN && user.getRole() != Role.MANAGER) {
 			return false;
 		}
@@ -162,6 +243,46 @@ public class EventManagement {
 		return true;
 	}
 
+	/**
+	 * Updates a given {@code Event} with the new fields, that are given. All
+	 * changed fields will be returned as a {@code List} of {@code SuccessCode}s
+	 * for feedback.
+	 * 
+	 * @param event
+	 *            The {@code Event} object to update
+	 * @param title
+	 *            The new title of the {@code Event}. May be null if no change
+	 *            should be done
+	 * @param description
+	 *            The new description of the {@code Event}. May be null if no
+	 *            change should be done
+	 * @param startDate
+	 *            The startDate title of the {@code Event}. May be null if no
+	 *            change should be done
+	 * @param endDate
+	 *            The new endDate of the {@code Event}. May be null if no change
+	 *            should be done
+	 * @param type
+	 *            The new {@code EventType} of the {@code Event}. May be null if
+	 *            no change should be done
+	 * @param childrenMayAttend
+	 *            Should be {@code true} if children may attend this
+	 *            {@code Event}
+	 * @param disciplesMayAttend
+	 *            Should be {@code true} if disciples may attend this
+	 *            {@code Event}
+	 * @param trainersMayAttend
+	 *            Should be {@code true} if trainers may attend this
+	 *            {@code Event}
+	 * @param mastersMayAttend
+	 *            Should be {@code true} if masters may attend this
+	 *            {@code Event}
+	 * @return Returns a {@code List} of {@code SuccessCode}s according to the
+	 *         changes made
+	 * @throws VocalServiceException
+	 *             Thrown if the startDate is greater the endDate after the
+	 *             changes were made
+	 */
 	private static List<SuccessCode> updateEventAttributes(Event event,
 			String title, String description, Long startDate, Long endDate,
 			EventType type, boolean childrenMayAttend,
@@ -180,6 +301,7 @@ public class EventManagement {
 			successCodes.add(SuccessCode.DESCRIPTION_CHANGED);
 		}
 
+		// use the 'old' value of startDate and endDate if given dates are null
 		long tmpStart = startDate != null ? startDate : event.getStartDate();
 		long tmpEnd = endDate != null ? endDate : event.getEndDate();
 		if (tmpStart >= tmpEnd) {
@@ -218,6 +340,14 @@ public class EventManagement {
 		return successCodes;
 	}
 
+	/**
+	 * Reads an {@code Event} from the database determined by its id.
+	 * 
+	 * @param id
+	 *            The id of the {@code Event} to search
+	 * @return The {@code Event} according to the id given. If no {@code Event}
+	 *         for the given id is found, null will be returned
+	 */
 	public static Event getEventById(long id) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
@@ -228,6 +358,41 @@ public class EventManagement {
 		return event;
 	}
 
+	/**
+	 * Creates an {@code Event} from the given input and stores it to the
+	 * database.
+	 * 
+	 * @param sessionId
+	 *            The sessionId of the {@code User} that wants to create the
+	 *            {@code Event}
+	 * @param title
+	 *            The title of the {@code Event} to create
+	 * @param description
+	 *            The description of the {@code Event} to create
+	 * @param startDate
+	 *            The startDate of the {@code Event} to create
+	 * @param endDate
+	 *            The endDate of the {@code Event} to create
+	 * @param type
+	 *            The {@code EventType} of the {@code Event} to create
+	 * @param childrenMayAttend
+	 *            Should be {@code true} if children may attend the
+	 *            {@code Event}; false otherwise
+	 * @param disciplesMayAttend
+	 *            Should be {@code true} if disciples may attend the
+	 *            {@code Event}; false otherwise
+	 * @param trainersMayAttend
+	 *            Should be {@code true} if trainers may attend the
+	 *            {@code Event}; false otherwise
+	 * @param mastersMayAttend
+	 *            Should be {@code true} if masters may attend the {@code Event}
+	 *            ; false otherwise
+	 * @throws VocalServiceException
+	 *             Thrown if event creation fails due to missing administration
+	 *             privileges, invalid field-values for the {@code Event} or if
+	 *             an internal error occurs while storing the {@code Event} to
+	 *             the database
+	 */
 	public static void createEvent(UUID sessionId, String title,
 			String description, Long startDate, Long endDate, EventType type,
 			boolean childrenMayAttend, boolean disciplesMayAttend,
@@ -242,10 +407,12 @@ public class EventManagement {
 			throw new VocalServiceException(ErrorCode.INVALID_USER_PERMISSIONS);
 		}
 
+		// create the event
 		Event event = createEventFromInput(title, description, startDate,
 				endDate, type, childrenMayAttend, disciplesMayAttend,
 				trainersMayAttend, mastersMayAttend);
 
+		// persist the event
 		Session session = null;
 		try {
 			session = HibernateUtil.getSessionFactory().openSession();
@@ -261,19 +428,39 @@ public class EventManagement {
 					e);
 		}
 
-		// invite all users having the according grades
+		// invite all users having the according grades to attend
 		inviteUsersToEvent(event);
 	}
 
+	/**
+	 * Searches and returns all {@code Event}s within a given time interval of a
+	 * {@code User}. Thereby all {@code Event}s are included that either start
+	 * or end within the interval or run through the whole given interval.
+	 * 
+	 * @param sessionId
+	 *            The sessionId of the {@code User} that requests the
+	 *            {@code Event}s
+	 * @param startDate
+	 *            The startDate of the interval-time
+	 * @param endDate
+	 *            The endDate of the interval in UNIX-time
+	 * @return Returns a {@code List} of {@code Event}s that lie within the
+	 *         given interval
+	 * @throws VocalServiceException
+	 *             Thrown if the given sessionId could not be found
+	 */
 	public static List<Event> getEventsBetween(UUID sessionId, long startDate,
 			long endDate) throws VocalServiceException {
 
+		// get the user according the given sessionId
 		User user = SessionManagement.getUserBySessionId(sessionId);
 		List<Event> events = new ArrayList<>();
 
 		if (null != user) {
 			Event event;
 			for (UserAttendance ua : user.getUserAttendance()) {
+
+				// get current event from the database
 				Session session = HibernateUtil.getSessionFactory()
 						.openSession();
 				session.beginTransaction();
@@ -281,6 +468,7 @@ public class EventManagement {
 				session.getTransaction().commit();
 				session.close();
 
+				// check if the current event lies within the interval
 				if ((event.getStartDate() >= startDate && event.getStartDate() <= endDate)
 						|| (event.getEndDate() >= startDate && event
 								.getEndDate() <= endDate)
@@ -300,6 +488,51 @@ public class EventManagement {
 		return events;
 	}
 
+	/**
+	 * Changes an existing {@code Event} in the database. If the change is
+	 * successful, a {@code Map} containing the {@code List} of
+	 * {@code SuccessCode}s, according to the changes made, and of the updated
+	 * {@code Event} will be returned.
+	 * 
+	 * @param sessionId
+	 *            The sessionId of the {@code User} that wants to change the
+	 *            {@code Event}
+	 * @param eventId
+	 *            The id of the {@code Event} to change
+	 * @param title
+	 *            The new title of the {@code Event}. May be null if no changes
+	 *            should be made
+	 * @param description
+	 *            The new description of the {@code Event}. May be null if no
+	 *            changes should be made
+	 * @param startDate
+	 *            The new startDate of the {@code Event}. May be null if no
+	 *            changes should be made
+	 * @param endDate
+	 *            The new endDate of the {@code Event}. May be null if no
+	 *            changes should be made
+	 * @param type
+	 *            The new {@code EventType} of the {@code Event}. May be null if
+	 *            no changes should be made
+	 * @param childrenMayAttend
+	 *            Should be {@code true} if children may attend this
+	 *            {@code Event}; false otherwise
+	 * @param disciplesMayAttend
+	 *            Should be {@code true} if disciples may attend this
+	 *            {@code Event}; false otherwise
+	 * @param trainersMayAttend
+	 *            Should be {@code true} if trainers may attend this
+	 *            {@code Event}; false otherwise
+	 * @param mastersMayAttend
+	 *            Should be {@code true} if masters may attend this
+	 *            {@code Event}; false otherwise
+	 * @return A {@code Map} containing a {@code List} of {@code SuccessCode}s
+	 *         and the updated {@code Event}
+	 * @throws VocalServiceException
+	 *             Thrown if the sessionId or the eventId could not be found,
+	 *             the according {@code User} to the sessionId has insufficient
+	 *             permissions or the input made by the {@code User} was invalid
+	 */
 	public static Map<Enum<ResultConstants>, Object> editEvent(UUID sessionId,
 			long eventId, String title, String description, Long startDate,
 			Long endDate, EventType type, boolean childrenMayAttend,
@@ -308,20 +541,27 @@ public class EventManagement {
 
 		Map<Enum<ResultConstants>, Object> result = new HashMap<>();
 
+		// get the user according the given sessionId
 		User user = SessionManagement.getUserBySessionId(sessionId);
+
+		// check user and his permissions
 		if (null == user) {
 			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
 		} else if (!userHasPermission(user)) {
 			throw new VocalServiceException(ErrorCode.INVALID_USER_PERMISSIONS);
 		}
 
-		List<SuccessCode> successCodes = null;
+		// get the event according the given eventId
 		Event event = EventManagement.getEventById(eventId);
 		if (event != null) {
+			List<SuccessCode> successCodes = null;
+
+			// update the event
 			successCodes = updateEventAttributes(event, title, description,
 					startDate, endDate, type, childrenMayAttend,
 					disciplesMayAttend, trainersMayAttend, mastersMayAttend);
 
+			// if attendance flags were changed - invite users
 			if (successCodes.contains(SuccessCode.ATTENDANCE_GRADES_CHANGED)) {
 				inviteUsersToEvent(event);
 			}
@@ -329,6 +569,7 @@ public class EventManagement {
 			result.put(ResultConstants.EDITEVENT_SUCCESSCODES_KEY, successCodes);
 			result.put(ResultConstants.EDITEVENT_EVENT_KEY, event);
 
+			// persist the updated event
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			session.beginTransaction();
 			session.update(event);
