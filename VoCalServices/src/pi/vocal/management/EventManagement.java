@@ -74,7 +74,9 @@ public class EventManagement {
 			logger.warn("No attendances grades selected!");
 		}
 
-		if (null == event.getEventType()) {
+		if (null == event.getEventType()
+				|| event.getEventType() == EventType.NOT_SELECTED) {
+			
 			errors.add(ErrorCode.EVENT_TYPE_MISSING);
 			logger.warn("No event type selected!");
 		}

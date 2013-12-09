@@ -69,12 +69,13 @@ public class EventService {
 		return response;
 	}
 
-//	@POST
-//	@Path("/editEvent")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public JsonResponse<List<?>> editEvent() {
-//		
-//	}
+	@POST
+	@Path("/editEvent")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JsonResponse<List<?>> editEvent() {
+		// TODO implement editEvent!
+		return null;
+	}
 	
 	@POST
 	@Path("/getEventsById")
