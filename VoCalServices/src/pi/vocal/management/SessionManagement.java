@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.management.helper.PasswordEncryptionHelper;
 import pi.vocal.management.helper.ResultConstants;
+import pi.vocal.management.returncodes.ErrorCode;
 import pi.vocal.persistence.dto.User;
 
 /**
@@ -118,7 +119,7 @@ public class SessionManagement {
 	public synchronized static Map<Enum<ResultConstants>, Object> login(
 			String email, String password) throws VocalServiceException {
 
-		logger.debug("[LOGIN] " + email + " " + password);
+		logger.debug("[LOGIN] Login try: " + email + " " + password);
 
 		// make sure the user won't get logged in twice
 		removeAlreadyLoggedInUser(email);
@@ -131,7 +132,6 @@ public class SessionManagement {
 			boolean success = false;
 
 			if (null != user) {
-				
 				// convert the users password and try to authenticate
 				byte[] userPwHash = PasswordEncryptionHelper
 						.convertFromBase64(user.getPwHash());

@@ -3,6 +3,7 @@ package pi.vocal.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.FormParam;
@@ -14,9 +15,10 @@ import javax.ws.rs.core.MediaType;
 import org.apache.log4j.Logger;
 
 import pi.vocal.event.EventType;
-import pi.vocal.management.ErrorCode;
 import pi.vocal.management.EventManagement;
 import pi.vocal.management.exception.VocalServiceException;
+import pi.vocal.management.helper.ResultConstants;
+import pi.vocal.management.returncodes.ErrorCode;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.service.dto.JsonResponse;
 import pi.vocal.service.dto.PublicEvent;
@@ -46,7 +48,7 @@ public class EventService {
 		response.setSuccess(true);
 
 		List<ErrorCode> errors = null;
-		
+
 		logger.debug("desc.: " + description);
 
 		try {
@@ -72,36 +74,68 @@ public class EventService {
 	@POST
 	@Path("/editEvent")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<List<?>> editEvent() {
-		// TODO implement editEvent!
-		return null;
+	public JsonResponse<?> editEvent(@FormParam("sessionid") UUID sessionId,
+			@FormParam("eventid") long eventId,
+			@FormParam("title") String title,
+			@FormParam("description") String description,
+			@FormParam("startdate") Long startDate,
+			@FormParam("enddate") Long endDate,
+			@FormParam("type") EventType type,
+			@FormParam("child") boolean childrenMayAttend,
+			@FormParam("disciple") boolean disciplesMayAttend,
+			@FormParam("trainer") boolean trainersMayAttend,
+			@FormParam("master") boolean mastersMayAttend) {
+
+		try {
+			JsonResponse<Map<Enum<ResultConstants>, Object>> response = new JsonResponse<>();
+			Map<Enum<ResultConstants>, Object> result = EventManagement
+					.editEvent(sessionId, eventId, title, description,
+							startDate, endDate, type, childrenMayAttend,
+							disciplesMayAttend, trainersMayAttend,
+							mastersMayAttend);
+			
+			// convert contained persistent event to a public event
+			PublicEvent publicEvent = new PublicEvent((Event) result.get(ResultConstants.EDITEVENT_EVENT_KEY));
+			result.put(ResultConstants.EDITEVENT_EVENT_KEY, publicEvent);
+			response.setSuccess(true);
+			response.setContent(result);
+			
+			return response;
+		} catch (VocalServiceException e) {
+			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
+			errorResponse.setSuccess(false);
+			errorResponse.setContent(e.getErrorCodes());
+			
+			return errorResponse;
+		}
 	}
-	
+
 	@POST
 	@Path("/getEventsById")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<?> getEventById(UUID sessionId, long eventId) {
-		
-		// get persistent event according to the 
+	public JsonResponse<?> getEventById(@FormParam("sessionid") UUID sessionId,
+			@FormParam("eventid") long eventId) {
+
+		// get persistent event according to the
 		Event persistentEvent = EventManagement.getEventById(eventId);
-		
+
 		if (null != persistentEvent) {
 			JsonResponse<PublicEvent> response = new JsonResponse<>();
 			response.setSuccess(true);
-			
+
 			PublicEvent publicEvent = new PublicEvent(persistentEvent);
 			response.setContent(publicEvent);
-			
+
 			return response;
 		} else {
 			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
 			errorResponse.setSuccess(false);
 			errorResponse.setContent(Arrays.asList(ErrorCode.INVALID_EVENT_ID));
-			
+
 			return errorResponse;
 		}
 	}
-	
+
 	@POST
 	@Path("/getEventsBetween")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -109,7 +143,7 @@ public class EventService {
 			@FormParam("sessionid") UUID sessionId,
 			@FormParam("startdate") long startDate,
 			@FormParam("enddate") long endDate) {
-		
+
 		JsonResponse<List<?>> response = new JsonResponse<>();
 		response.setSuccess(true);
 
@@ -118,7 +152,7 @@ public class EventService {
 			List<PublicEvent> resultEvents = new ArrayList<>();
 			List<Event> internalEvents = EventManagement.getEventsBetween(
 					sessionId, startDate, endDate);
-			
+
 			for (Event event : internalEvents) {
 				resultEvents.add(new PublicEvent(event));
 			}
@@ -128,7 +162,7 @@ public class EventService {
 			response.setSuccess(false);
 			response.setContent(e.getErrorCodes());
 		}
-		
+
 		return response;
 	}
 }

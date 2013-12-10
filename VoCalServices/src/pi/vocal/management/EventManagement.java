@@ -15,6 +15,8 @@ import org.hibernate.Session;
 import pi.vocal.event.EventType;
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.management.helper.ResultConstants;
+import pi.vocal.management.returncodes.ErrorCode;
+import pi.vocal.management.returncodes.SuccessCode;
 import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
@@ -76,7 +78,7 @@ public class EventManagement {
 
 		if (null == event.getEventType()
 				|| event.getEventType() == EventType.NOT_SELECTED) {
-			
+
 			errors.add(ErrorCode.EVENT_TYPE_MISSING);
 			logger.warn("No event type selected!");
 		}
@@ -172,6 +174,7 @@ public class EventManagement {
 		eventDto.setStartDate(startDate);
 		eventDto.setEndDate(endDate);
 
+		// convert the given attendance grades to a set and add them
 		eventDto.setAttendantsGrades(createSetOfAttendanceGrades(
 				childrenMayAttend, disciplesMayAttend, trainersMayAttend,
 				mastersMayAttend));
@@ -401,7 +404,7 @@ public class EventManagement {
 			boolean trainersMayAttend, boolean mastersMayAttend)
 			throws VocalServiceException {
 
-		// check session validity and permissions
+		// check session validity and user permissions
 		User user = SessionManagement.getUserBySessionId(sessionId);
 		if (null == user) {
 			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
@@ -430,7 +433,7 @@ public class EventManagement {
 					e);
 		}
 
-		// invite all users having the according grades to attend
+		// invite all users having an according grade
 		inviteUsersToEvent(event);
 	}
 
@@ -563,6 +566,7 @@ public class EventManagement {
 					startDate, endDate, type, childrenMayAttend,
 					disciplesMayAttend, trainersMayAttend, mastersMayAttend);
 
+			// TODO test what happens, if users already attend this event! 
 			// if attendance flags were changed - invite users
 			if (successCodes.contains(SuccessCode.ATTENDANCE_GRADES_CHANGED)) {
 				inviteUsersToEvent(event);

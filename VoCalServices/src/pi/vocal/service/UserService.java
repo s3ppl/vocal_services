@@ -13,11 +13,11 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
 
-import pi.vocal.management.ErrorCode;
-import pi.vocal.management.SuccessCode;
 import pi.vocal.management.UserManagement;
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.management.helper.ResultConstants;
+import pi.vocal.management.returncodes.ErrorCode;
+import pi.vocal.management.returncodes.SuccessCode;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.service.dto.JsonResponse;
 import pi.vocal.service.dto.PublicUser;

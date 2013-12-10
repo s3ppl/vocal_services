@@ -17,6 +17,8 @@ import org.hibernate.criterion.Restrictions;
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.management.helper.PasswordEncryptionHelper;
 import pi.vocal.management.helper.ResultConstants;
+import pi.vocal.management.returncodes.ErrorCode;
+import pi.vocal.management.returncodes.SuccessCode;
 import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.persistence.dto.UserAttendance;

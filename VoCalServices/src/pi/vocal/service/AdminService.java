@@ -11,8 +11,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import pi.vocal.management.AdminManagement;
-import pi.vocal.management.ErrorCode;
 import pi.vocal.management.exception.VocalServiceException;
+import pi.vocal.management.returncodes.ErrorCode;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.service.dto.JsonResponse;
 import pi.vocal.service.dto.PublicUser;

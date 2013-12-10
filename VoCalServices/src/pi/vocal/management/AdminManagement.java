@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.hibernate.Session;
 
 import pi.vocal.management.exception.VocalServiceException;
+import pi.vocal.management.returncodes.ErrorCode;
 import pi.vocal.persistence.HibernateUtil;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.user.Role;
