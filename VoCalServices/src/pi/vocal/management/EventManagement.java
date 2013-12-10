@@ -435,6 +435,9 @@ public class EventManagement {
 
 		// invite all users having an according grade
 		inviteUsersToEvent(event);
+		
+		// update the user in the session
+		SessionManagement.updateSessionUser(sessionId, user);
 	}
 
 	/**
