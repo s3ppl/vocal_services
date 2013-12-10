@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import pi.vocal.event.EventType;
 import pi.vocal.management.UserManagement;
 import pi.vocal.persistence.dto.Event;
@@ -19,18 +21,28 @@ import pi.vocal.user.SchoolLocation;
  * his password and without a circular relation with his events. Therefore a
  * nested event class is used (see below).
  * 
+ * NOTE: Some fields have different names in the calendar framework used in the
+ * front end. Therefore the "@JsonProperty" annotation is used to map them to
+ * the according names.
+ * 
  * @author s3ppl
  * 
  */
 public class PublicEvent {
+
+	@JsonProperty("start")
 	private long startDate;
+
+	@JsonProperty("end")
 	private long endDate;
 
 	private String title;
 	private String description;
 
+	@JsonProperty("class")
 	private EventType eventType;
 
+	@JsonProperty("id")
 	private long eventId;
 
 	private List<EventUser> attendants = new ArrayList<EventUser>();
