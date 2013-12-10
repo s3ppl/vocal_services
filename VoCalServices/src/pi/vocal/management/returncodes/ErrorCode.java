@@ -1,4 +1,4 @@
-package pi.vocal.management;
+package pi.vocal.management.returncodes;
 
 public enum ErrorCode {
 
