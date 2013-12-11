@@ -15,7 +15,7 @@ import pi.vocal.user.SchoolLocation;
 
 /**
  * This class is the public representation of a {@code User}. It is used by the
- * webservices and contains all fields of the persistent user except for
+ * WebServices and contains all fields of the persistent user except for
  * password data.
  * 
  * NOTE: Due to cycles in the relational mapping between {@code User} and

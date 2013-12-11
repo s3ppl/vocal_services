@@ -1,8 +1,8 @@
 package pi.vocal.service.dto;
 
 /**
- * Wrapper class that are used by JSON WebService. This class will be mapped by
- * the framework Jackson, therefore it has to be a JavaBean-like class
+ * Wrapper class that are used by JSON WebServices. This class will be mapped by
+ * the framework Jackson, therefore it has to be a JavaBean-like class.
  * 
  * @author s3ppl
  * 
@@ -30,10 +30,9 @@ public class JsonResponse<T> {
 		return success;
 	}
 
-/**
+	/**
 	 * Sets the value of {@code success} to the given value by converting the
 	 * {@code boolean) value to its JSON representation.
-	 * 
 	 * @param isSuccessful
 	 */
 	public void setSuccess(boolean isSuccessful) {

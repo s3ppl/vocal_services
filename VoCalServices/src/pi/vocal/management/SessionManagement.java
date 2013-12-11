@@ -22,8 +22,7 @@ import pi.vocal.persistence.dto.User;
  * 
  */
 public class SessionManagement {
-	private final static Logger logger = Logger
-			.getLogger(SessionManagement.class);
+	private final static Logger logger = Logger.getLogger(SessionManagement.class);
 
 	/**
 	 * Maximum amount of tries to create a unique session id
@@ -36,6 +35,9 @@ public class SessionManagement {
 	 */
 	private static Map<UUID, User> sessions = new ConcurrentHashMap<UUID, User>();
 
+	/**
+	 * Private constructor since all methods are static.
+	 */
 	private SessionManagement() {
 	}
 
@@ -71,9 +73,7 @@ public class SessionManagement {
 	private static void removeAlreadyLoggedInUser(String email) {
 		for (UUID id : sessions.keySet()) {
 			if (sessions.get(id).getEmail().equals(email)) {
-				logger.warn("User was already logged in. Remove session id: "
-						+ id.toString());
-
+				logger.warn("User was already logged in. Removing session id: " + id.toString());
 				sessions.remove(id);
 			}
 		}
@@ -99,9 +99,9 @@ public class SessionManagement {
 			if (!sessionIdExists(sessionId)) {
 				done = true;
 			} else if (count >= MAX_SESSION_ID_CREATION_CYCLES) {
-				throw new VocalServiceException(ErrorCode.INTERNAL_ERROR,
-						new RuntimeException(
-								"Failed to create a unique session id!"));
+				logger.error("Failed to create a unique sessionId after max. cycles! Max cycles were: "
+						+ MAX_SESSION_ID_CREATION_CYCLES);
+				throw new VocalServiceException(ErrorCode.INTERNAL_ERROR);
 			}
 		}
 
@@ -123,10 +123,8 @@ public class SessionManagement {
 	 *             Thrown if either the authentication of the user failed or an
 	 *             internal error occurred.
 	 */
-	public synchronized static Map<Enum<ResultConstants>, Object> login(
-			String email, String password) throws VocalServiceException {
-
-		logger.debug("[LOGIN] Login try: " + email + " " + password);
+	public synchronized static Map<Enum<ResultConstants>, Object> login(String email, String password)
+			throws VocalServiceException {
 
 		// make sure the user won't get logged in twice
 		removeAlreadyLoggedInUser(email);
@@ -140,28 +138,22 @@ public class SessionManagement {
 
 			if (null != user) {
 				// convert the users password and try to authenticate
-				byte[] userPwHash = PasswordEncryptionHelper
-						.convertFromBase64(user.getPwHash());
-				byte[] userPwSalt = PasswordEncryptionHelper
-						.convertFromBase64(user.getPwSalt());
-				success = PasswordEncryptionHelper.authenticate(password,
-						userPwHash, userPwSalt);
+				byte[] userPwHash = PasswordEncryptionHelper.convertFromBase64(user.getPwHash());
+				byte[] userPwSalt = PasswordEncryptionHelper.convertFromBase64(user.getPwSalt());
+				success = PasswordEncryptionHelper.authenticate(password, userPwHash, userPwSalt);
 			}
 
 			if (!success) {
 				throw new VocalServiceException(ErrorCode.AUTHENTICATION_FAILED);
 			}
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-			logger.error("Password encryption failed.", e);
+			logger.error("Password encryption failed. See nested Exception for details.", e);
 			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, e);
 		}
 
 		// add the users session
 		UUID sessionId = generateSessionId();
 		sessions.put(sessionId, user);
-
-		logger.debug("[LOGIN] A user logged in: " + user.getEmail()
-				+ ". Given sessionId is: " + sessionId);
 
 		result.put(ResultConstants.LOGIN_USER_KEY, user);
 		result.put(ResultConstants.LOGIN_SESSIONID_KEY, sessionId);
@@ -177,8 +169,6 @@ public class SessionManagement {
 	 */
 	public synchronized static void logout(UUID sessionId) {
 		if (null != sessionId && sessions.containsKey(sessionId)) {
-			logger.debug("[LOGOUT] sessionId: " + sessionId);
-
 			sessions.remove(sessionId);
 		}
 	}
@@ -211,9 +201,6 @@ public class SessionManagement {
 		// check for id existence to ensure 'overwrite only'
 		if (sessions.containsKey(sessionId)) {
 			sessions.put(sessionId, user);
-
-			logger.debug("[UPDATE USER] updated user with sessionId"
-					+ sessionId);
 		}
 	}
 }

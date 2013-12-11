@@ -37,8 +37,6 @@ import pi.vocal.user.SchoolLocation;
 public class UserManagement {
 	private static final Logger logger = Logger.getLogger(UserManagement.class);
 
-	// TODO add logging
-
 	/**
 	 * Minimum length a password must have
 	 */
@@ -67,8 +65,7 @@ public class UserManagement {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
 
-		User user = (User) session.createCriteria(User.class)
-				.add(Restrictions.eq("email", email)).uniqueResult();
+		User user = (User) session.createCriteria(User.class).add(Restrictions.eq("email", email)).uniqueResult();
 
 		session.getTransaction().commit();
 		session.close();
@@ -87,10 +84,13 @@ public class UserManagement {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		session.beginTransaction();
 
-		Query query = session
-				.createSQLQuery("select * from user u where u.grade = :grade")
-				.addEntity(User.class).setParameter("grade", grade.ordinal());
+		// since the Hibernate native query API seems to have issues with this
+		// query, an SQL query is used
+		Query query = session.createSQLQuery("select * from user u where u.grade = :grade").addEntity(User.class)
+				.setParameter("grade", grade.ordinal());
 
+		// should be a safe cast, since the entity class is specified in the
+		// query
 		@SuppressWarnings("unchecked")
 		List<User> result = query.list();
 
@@ -129,9 +129,7 @@ public class UserManagement {
 			logger.warn("No grade selected!");
 		}
 
-		if (null == user.getSchoolLocation()
-				|| user.getSchoolLocation() == SchoolLocation.NOT_SELECTED) {
-
+		if (null == user.getSchoolLocation() || user.getSchoolLocation() == SchoolLocation.NOT_SELECTED) {
 			errorCodes.add(ErrorCode.SCHOOL_LOCATION_MISSING);
 			logger.warn("No school location selected!");
 		}
@@ -179,10 +177,8 @@ public class UserManagement {
 	 *             Thrown if any value the user entered is invalid or an
 	 *             internal error occurred
 	 */
-	private static User createUserFromUserInput(String firstName,
-			String lastName, String email, Grade grade,
-			SchoolLocation schoolLocation, String password)
-			throws VocalServiceException {
+	private static User createUserFromUserInput(String firstName, String lastName, String email, Grade grade,
+			SchoolLocation schoolLocation, String password) throws VocalServiceException {
 
 		// create user object from given input
 		User userDto = new User();
@@ -199,24 +195,22 @@ public class UserManagement {
 
 		// if any value was invalid, throw an exception containing the errors
 		if (null != errorCodes && errorCodes.size() > 0) {
-			throw new VocalServiceException(errorCodes,
-					"Account creation failed due to invalid user input.");
+			logger.warn("Account creation failed due to invalid user input.");
+			throw new VocalServiceException(errorCodes);
 		}
 
 		try {
 			// create and set password hash and salt
 			byte[] pwSalt = PasswordEncryptionHelper.generateSalt();
-			byte[] encryptedPw = PasswordEncryptionHelper.getEncryptedPassword(
-					password, pwSalt);
+			byte[] encryptedPw = PasswordEncryptionHelper.getEncryptedPassword(password, pwSalt);
 
 			userDto.setPwSalt(PasswordEncryptionHelper.convertToBase64(pwSalt));
-			userDto.setPwHash(PasswordEncryptionHelper
-					.convertToBase64(encryptedPw));
+			userDto.setPwHash(PasswordEncryptionHelper.convertToBase64(encryptedPw));
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-			throw new VocalServiceException(
-					ErrorCode.INTERNAL_ERROR,
+			logger.error(
 					"Could not create Account. Password hashing or salting failed. See nested Exception for further details.",
 					e);
+			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, e);
 		}
 
 		return userDto;
@@ -234,18 +228,15 @@ public class UserManagement {
 	 * @throws VocalServiceException
 	 *             Thrown if the encryption of the given password fails
 	 */
-	private static boolean verifyCurrentPassword(User user, String password)
-			throws VocalServiceException {
+	private static boolean verifyCurrentPassword(User user, String password) throws VocalServiceException {
 
 		boolean result = false;
 		try {
-			byte[] userPwHash = PasswordEncryptionHelper.convertFromBase64(user
-					.getPwHash());
-			byte[] userPwSalt = PasswordEncryptionHelper.convertFromBase64(user
-					.getPwSalt());
-			result = PasswordEncryptionHelper.authenticate(password,
-					userPwHash, userPwSalt);
+			byte[] userPwHash = PasswordEncryptionHelper.convertFromBase64(user.getPwHash());
+			byte[] userPwSalt = PasswordEncryptionHelper.convertFromBase64(user.getPwSalt());
+			result = PasswordEncryptionHelper.authenticate(password, userPwHash, userPwSalt);
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			logger.error("Password encryption failed! See nested Exception for details.", e);
 			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, e);
 		}
 
@@ -271,14 +262,12 @@ public class UserManagement {
 	 *             Thrown if the creation of the user fails due to invalid input
 	 *             or an internal error
 	 */
-	public static void createUser(String firstName, String lastName,
-			String email, Grade grade, SchoolLocation schoolLocation,
-			String password) throws VocalServiceException {
+	public static void createUser(String firstName, String lastName, String email, Grade grade,
+			SchoolLocation schoolLocation, String password) throws VocalServiceException {
 
 		Session session = null;
 		try {
-			User userDto = createUserFromUserInput(firstName, lastName, email,
-					grade, schoolLocation, password);
+			User userDto = createUserFromUserInput(firstName, lastName, email, grade, schoolLocation, password);
 
 			session = HibernateUtil.getSessionFactory().openSession();
 			session.beginTransaction();
@@ -287,10 +276,10 @@ public class UserManagement {
 			session.flush();
 			session.close();
 		} catch (HibernateException he) {
-			throw new VocalServiceException(
-					ErrorCode.INTERNAL_ERROR,
+			logger.error(
 					"Could not create Account. Storing to the database failed. See nested Exception for further details.",
 					he);
+			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, he);
 		}
 	}
 
@@ -314,12 +303,10 @@ public class UserManagement {
 	 *             current password was incorrect e) the given sessionId could
 	 *             not be found
 	 */
-	public static SuccessCode changePassword(UUID sessionId,
-			String oldPassword, String newPassword1, String newPassword2)
-			throws VocalServiceException {
+	public static SuccessCode changePassword(UUID sessionId, String oldPassword, String newPassword1,
+			String newPassword2) throws VocalServiceException {
 
-		if (null == newPassword1 || null == newPassword2
-				|| !newPassword1.equals(newPassword2)) {
+		if (null == newPassword1 || null == newPassword2 || !newPassword1.equals(newPassword2)) {
 			throw new VocalServiceException(ErrorCode.PASSWORDS_DONT_MATCH);
 		} else if (newPassword1.length() < MIN_PW_LEN) {
 			throw new VocalServiceException(ErrorCode.PASSWORD_TOO_SHORT);
@@ -327,8 +314,7 @@ public class UserManagement {
 
 		User user = SessionManagement.getUserBySessionId(sessionId);
 		if (null != user) {
-			if (null == oldPassword
-					|| !verifyCurrentPassword(user, oldPassword)) {
+			if (null == oldPassword || !verifyCurrentPassword(user, oldPassword)) {
 
 				throw new VocalServiceException(ErrorCode.AUTHENTICATION_FAILED);
 			}
@@ -337,26 +323,22 @@ public class UserManagement {
 			try {
 				// generate new password and salt for storing
 				byte[] newPwSalt = PasswordEncryptionHelper.generateSalt();
-				byte[] newPwHash = PasswordEncryptionHelper
-						.getEncryptedPassword(newPassword1, newPwSalt);
-				String encodedPw = PasswordEncryptionHelper
-						.convertToBase64(newPwHash);
-				String encodedSalt = PasswordEncryptionHelper
-						.convertToBase64(newPwSalt);
+				byte[] newPwHash = PasswordEncryptionHelper.getEncryptedPassword(newPassword1, newPwSalt);
+				String encodedPw = PasswordEncryptionHelper.convertToBase64(newPwHash);
+				String encodedSalt = PasswordEncryptionHelper.convertToBase64(newPwSalt);
 
 				user.setPwHash(encodedPw);
 				user.setPwSalt(encodedSalt);
 
 				// persist the changed user object
-				Session session = HibernateUtil.getSessionFactory()
-						.openSession();
+				Session session = HibernateUtil.getSessionFactory().openSession();
 				session.beginTransaction();
 				session.update(user);
 				session.getTransaction().commit();
 				session.flush();
 				session.close();
-			} catch (NoSuchAlgorithmException | InvalidKeySpecException
-					| HibernateException e) {
+			} catch (NoSuchAlgorithmException | InvalidKeySpecException | HibernateException e) {
+				logger.error("Password encryption failed! See nested Exception for details.", e);
 				throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, e);
 			}
 		} else {
@@ -401,9 +383,8 @@ public class UserManagement {
 	 *             Thrown if the user with the given session id could not be
 	 *             found
 	 */
-	public static Map<Enum<ResultConstants>, Object> editUser(UUID sessionId,
-			String firstName, String lastName, SchoolLocation location)
-			throws VocalServiceException {
+	public static Map<Enum<ResultConstants>, Object> editUser(UUID sessionId, String firstName, String lastName,
+			SchoolLocation location) throws VocalServiceException {
 
 		Map<Enum<ResultConstants>, Object> result = new HashMap<Enum<ResultConstants>, Object>();
 		List<SuccessCode> successCodes = new ArrayList<>();
@@ -441,6 +422,7 @@ public class UserManagement {
 			result.put(ResultConstants.EDITUSER_SUCCESSCODES_KEY, successCodes);
 			result.put(ResultConstants.EDITUSER_USER_KEY, user);
 		} else {
+			logger.warn("User with given session id could not be found. Session id: " + sessionId);
 			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
 		}
 
@@ -461,8 +443,7 @@ public class UserManagement {
 	 * @throws VocalServiceException
 	 *             Thrown if the given sessionId could not be found
 	 */
-	public static void setEventAttendance(UUID sessionId, long eventId,
-			boolean attends) throws VocalServiceException {
+	public static void setEventAttendance(UUID sessionId, long eventId, boolean attends) throws VocalServiceException {
 		User user = SessionManagement.getUserBySessionId(sessionId);
 
 		if (user != null) {
@@ -476,8 +457,7 @@ public class UserManagement {
 			}
 
 			if (userAttendance != null) {
-				Session session = HibernateUtil.getSessionFactory()
-						.openSession();
+				Session session = HibernateUtil.getSessionFactory().openSession();
 				session.beginTransaction();
 				session.update(userAttendance);
 				session.getTransaction().commit();
@@ -485,6 +465,7 @@ public class UserManagement {
 				session.close();
 			}
 		} else {
+			logger.warn("User with given session id could not be found. Session id: " + sessionId);
 			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
 		}
 	}

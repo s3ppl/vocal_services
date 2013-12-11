@@ -3,6 +3,7 @@ package pi.vocal.management;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 import pi.vocal.management.exception.VocalServiceException;
@@ -12,31 +13,35 @@ import pi.vocal.persistence.dto.User;
 import pi.vocal.user.Role;
 
 /**
- * This class contains all functions an administrator can use.
+ * This class contains all functions only an administrator can use.
  * 
  * @author s3ppl
  * 
  */
 public class AdminManagement {
-	
+	private static final Logger logger = Logger.getLogger(AdminManagement.class);
+
+	/**
+	 * Private constructor since all methods are static.
+	 */
 	private AdminManagement() {
 	}
 
 	/**
-	 * Checks the given admin user for null and admin permissions.
+	 * Checks the given admin user for {@code null} and admin permissions.
 	 * 
 	 * @param admin
 	 *            The {@code User} object to check for admin permissions
 	 * @throws VocalServiceException
-	 *             Thrown if either the given {@code User} object is null it has
-	 *             no admin permissions
+	 *             Thrown if either the given {@code User} object is null or the
+	 *             user has no admin permissions
 	 */
-	private static void verifyAdminUser(User admin)
-			throws VocalServiceException {
-
+	private static void verifyAdminUser(User admin) throws VocalServiceException {
 		if (null == admin) {
+			logger.warn("Given admin user was null!");
 			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
 		} else if (admin.getRole() != Role.ADMIN) {
+			logger.warn("Given user has no admin privileges!");
 			throw new VocalServiceException(ErrorCode.INVALID_USER_PERMISSIONS);
 		}
 	}
@@ -72,8 +77,7 @@ public class AdminManagement {
 	 *             Thrown if the demanding {@code User} could not be found or
 	 *             has insufficient permissions
 	 */
-	public static List<User> getAllUsers(UUID sessionId)
-			throws VocalServiceException {
+	public static List<User> getAllUsers(UUID sessionId) throws VocalServiceException {
 
 		verifyAdminUser(SessionManagement.getUserBySessionId(sessionId));
 		return getAllUsersFromDatabase();
@@ -96,9 +100,7 @@ public class AdminManagement {
 	 *             found, has insufficient permissions or the {@code User} thats
 	 *             {@code Role} should be changed could not be found
 	 */
-	public static void setUserRole(UUID sessionId, long userId, Role newRole)
-			throws VocalServiceException {
-
+	public static void setUserRole(UUID sessionId, long userId, Role newRole) throws VocalServiceException {
 		verifyAdminUser(SessionManagement.getUserBySessionId(sessionId));
 		User user = UserManagement.getUserById(userId);
 
@@ -111,6 +113,7 @@ public class AdminManagement {
 			session.getTransaction().commit();
 			session.close();
 		} else {
+			logger.warn("No user for the given userId could be found! User id: " + userId);
 			throw new VocalServiceException(ErrorCode.INVALID_USER_ID);
 		}
 	}

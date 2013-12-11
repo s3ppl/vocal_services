@@ -32,8 +32,7 @@ import pi.vocal.user.Role;
  * 
  */
 public class EventManagement {
-	private final static Logger logger = Logger
-			.getLogger(EventManagement.class);
+	private final static Logger logger = Logger.getLogger(EventManagement.class);
 
 	/**
 	 * Private constructor since all methods are static.
@@ -52,8 +51,6 @@ public class EventManagement {
 	 */
 	private static List<ErrorCode> verifyEventInput(Event event) {
 		List<ErrorCode> errors = new ArrayList<>();
-
-		logger.info("Verifying event with title: " + event.getTitle());
 
 		if (null == event.getTitle() || event.getTitle().isEmpty()) {
 			errors.add(ErrorCode.TITLE_MISSING);
@@ -76,8 +73,7 @@ public class EventManagement {
 			logger.warn("No attendances grades selected!");
 		}
 
-		if (null == event.getEventType()
-				|| event.getEventType() == EventType.NOT_SELECTED) {
+		if (null == event.getEventType() || event.getEventType() == EventType.NOT_SELECTED) {
 
 			errors.add(ErrorCode.EVENT_TYPE_MISSING);
 			logger.warn("No event type selected!");
@@ -105,8 +101,7 @@ public class EventManagement {
 	 * @return Returns a {@code Set} of {@code Grade}s that were marked as
 	 *         {@code true}
 	 */
-	private static Set<Grade> createSetOfAttendanceGrades(
-			boolean childrenMayAttend, boolean disciplesMayAttend,
+	private static Set<Grade> createSetOfAttendanceGrades(boolean childrenMayAttend, boolean disciplesMayAttend,
 			boolean trainersMayAttend, boolean mastersMayAttend) {
 
 		Set<Grade> attendanceGrades = new HashSet<>();
@@ -160,11 +155,9 @@ public class EventManagement {
 	 * @throws VocalServiceException
 	 *             Thrown if the verification of the given input fails
 	 */
-	private static Event createEventFromInput(String title, String description,
-			Long startDate, Long endDate, EventType type,
-			boolean childrenMayAttend, boolean disciplesMayAttend,
-			boolean trainersMayAttend, boolean mastersMayAttend)
-			throws VocalServiceException {
+	private static Event createEventFromInput(String title, String description, Long startDate, Long endDate,
+			EventType type, boolean childrenMayAttend, boolean disciplesMayAttend, boolean trainersMayAttend,
+			boolean mastersMayAttend) throws VocalServiceException {
 
 		// create event object from the given input
 		Event eventDto = new Event();
@@ -175,16 +168,15 @@ public class EventManagement {
 		eventDto.setEndDate(endDate);
 
 		// convert the given attendance grades to a set and add them
-		eventDto.setAttendantsGrades(createSetOfAttendanceGrades(
-				childrenMayAttend, disciplesMayAttend, trainersMayAttend,
-				mastersMayAttend));
+		eventDto.setAttendantsGrades(createSetOfAttendanceGrades(childrenMayAttend, disciplesMayAttend,
+				trainersMayAttend, mastersMayAttend));
 
 		List<ErrorCode> errorCodes = verifyEventInput(eventDto);
 
 		// if any error occurred, throw an exception
 		if (null != errorCodes && errorCodes.size() > 0) {
-			throw new VocalServiceException(errorCodes,
-					"Event creation failed due to invalid input.");
+			logger.warn("Event creation failed due to invalid input.");
+			throw new VocalServiceException(errorCodes);
 		}
 
 		return eventDto;
@@ -246,8 +238,7 @@ public class EventManagement {
 
 					// persist the UserAttendance and update the references of
 					// the event and the current user
-					Session session = HibernateUtil.getSessionFactory()
-							.openSession();
+					Session session = HibernateUtil.getSessionFactory().openSession();
 					session.beginTransaction();
 					session.save(userAttendance);
 					session.update(user);
@@ -317,11 +308,9 @@ public class EventManagement {
 	 *             Thrown if the startDate is greater the endDate after the
 	 *             changes were made
 	 */
-	private static List<SuccessCode> updateEventAttributes(Event event,
-			String title, String description, Long startDate, Long endDate,
-			EventType type, boolean childrenMayAttend,
-			boolean disciplesMayAttend, boolean trainersMayAttend,
-			boolean mastersMayAttend) throws VocalServiceException {
+	private static List<SuccessCode> updateEventAttributes(Event event, String title, String description,
+			Long startDate, Long endDate, EventType type, boolean childrenMayAttend, boolean disciplesMayAttend,
+			boolean trainersMayAttend, boolean mastersMayAttend) throws VocalServiceException {
 
 		List<SuccessCode> successCodes = new ArrayList<>();
 
@@ -427,11 +416,9 @@ public class EventManagement {
 	 *             an internal error occurs while storing the {@code Event} to
 	 *             the database
 	 */
-	public static void createEvent(UUID sessionId, String title,
-			String description, Long startDate, Long endDate, EventType type,
-			boolean childrenMayAttend, boolean disciplesMayAttend,
-			boolean trainersMayAttend, boolean mastersMayAttend)
-			throws VocalServiceException {
+	public static void createEvent(UUID sessionId, String title, String description, Long startDate, Long endDate,
+			EventType type, boolean childrenMayAttend, boolean disciplesMayAttend, boolean trainersMayAttend,
+			boolean mastersMayAttend) throws VocalServiceException {
 
 		// check session validity and user permissions
 		User user = SessionManagement.getUserBySessionId(sessionId);
@@ -442,9 +429,8 @@ public class EventManagement {
 		}
 
 		// create the event
-		Event event = createEventFromInput(title, description, startDate,
-				endDate, type, childrenMayAttend, disciplesMayAttend,
-				trainersMayAttend, mastersMayAttend);
+		Event event = createEventFromInput(title, description, startDate, endDate, type, childrenMayAttend,
+				disciplesMayAttend, trainersMayAttend, mastersMayAttend);
 
 		// persist the event
 		Session session = null;
@@ -456,10 +442,10 @@ public class EventManagement {
 			session.flush();
 			session.close();
 		} catch (HibernateException e) {
-			String errorMsg = "Could not create Account. Storing to the database failed. See nested Exception for further details.";
-			logger.error(errorMsg, e);
-			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, errorMsg,
+			logger.error(
+					"Could not create Account. Storing to the database failed. See nested Exception for further details.",
 					e);
+			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, e);
 		}
 
 		// invite all users having an according grade
@@ -486,8 +472,8 @@ public class EventManagement {
 	 * @throws VocalServiceException
 	 *             Thrown if the given sessionId could not be found
 	 */
-	public static List<Event> getEventsBetween(UUID sessionId, long startDate,
-			long endDate) throws VocalServiceException {
+	public static List<Event> getEventsBetween(UUID sessionId, long startDate, long endDate)
+			throws VocalServiceException {
 
 		// get the user according the given sessionId
 		User user = SessionManagement.getUserBySessionId(sessionId);
@@ -498,8 +484,7 @@ public class EventManagement {
 			for (UserAttendance ua : user.getUserAttendance()) {
 
 				// get current event from the database
-				Session session = HibernateUtil.getSessionFactory()
-						.openSession();
+				Session session = HibernateUtil.getSessionFactory().openSession();
 				session.beginTransaction();
 				event = (Event) session.get(Event.class, ua.getEventId());
 				session.getTransaction().commit();
@@ -507,18 +492,15 @@ public class EventManagement {
 
 				// check if the current event lies within the interval
 				if ((event.getStartDate() >= startDate && event.getStartDate() <= endDate)
-						|| (event.getEndDate() >= startDate && event
-								.getEndDate() <= endDate)
-						|| (event.getStartDate() < startDate && event
-								.getEndDate() > endDate)) {
+						|| (event.getEndDate() >= startDate && event.getEndDate() <= endDate)
+						|| (event.getStartDate() < startDate && event.getEndDate() > endDate)) {
 
 					events.add(event);
 				}
 
 			}
 		} else {
-			logger.warn("No user with the following session id could be found: "
-					+ sessionId);
+			logger.warn("No user with the following session id could be found: " + sessionId);
 			throw new VocalServiceException(ErrorCode.SESSION_INVALID);
 		}
 
@@ -570,11 +552,10 @@ public class EventManagement {
 	 *             the according {@code User} to the sessionId has insufficient
 	 *             permissions or the input made by the {@code User} was invalid
 	 */
-	public static Map<Enum<ResultConstants>, Object> editEvent(UUID sessionId,
-			long eventId, String title, String description, Long startDate,
-			Long endDate, EventType type, boolean childrenMayAttend,
-			boolean disciplesMayAttend, boolean trainersMayAttend,
-			boolean mastersMayAttend) throws VocalServiceException {
+	public static Map<Enum<ResultConstants>, Object> editEvent(UUID sessionId, long eventId, String title,
+			String description, Long startDate, Long endDate, EventType type, boolean childrenMayAttend,
+			boolean disciplesMayAttend, boolean trainersMayAttend, boolean mastersMayAttend)
+			throws VocalServiceException {
 
 		Map<Enum<ResultConstants>, Object> result = new HashMap<>();
 
@@ -594,11 +575,9 @@ public class EventManagement {
 			List<SuccessCode> successCodes = null;
 
 			// update the event
-			successCodes = updateEventAttributes(event, title, description,
-					startDate, endDate, type, childrenMayAttend,
-					disciplesMayAttend, trainersMayAttend, mastersMayAttend);
+			successCodes = updateEventAttributes(event, title, description, startDate, endDate, type,
+					childrenMayAttend, disciplesMayAttend, trainersMayAttend, mastersMayAttend);
 
-			// TODO test what happens, if users already attend this event!
 			// if attendance flags were changed - invite users
 			if (successCodes.contains(SuccessCode.ATTENDANCE_GRADES_CHANGED)) {
 				inviteUsersToEvent(event);
@@ -615,6 +594,7 @@ public class EventManagement {
 			session.flush();
 			session.close();
 		} else {
+			logger.warn("No event with the given eventId could be found. Event id: " + eventId);
 			throw new VocalServiceException(ErrorCode.INVALID_EVENT_ID);
 		}
 

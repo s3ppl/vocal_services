@@ -14,14 +14,31 @@ import javax.ws.rs.core.MediaType;
 import pi.vocal.event.EventType;
 import pi.vocal.user.SchoolLocation;
 
-// TODO comment me!
-
+/**
+ * This class contains a single WebService that is used by the front end to load
+ * all {@code SchoolLocation}s used in the system dynamically.
+ * 
+ * @author s3ppl
+ * 
+ */
 @Path("/LocationMgmt")
 public class LocationService {
 
+	/**
+	 * Actual response send by the server. Filled by injection.
+	 */
 	@Context
 	private HttpServletResponse response;
-	
+
+	/**
+	 * WebService that returns all used {@code SchoolLocation}s used in the
+	 * system as {@code Map}. For compatibility reasons, the response will be
+	 * encoded in "UTF-8".
+	 * 
+	 * @return Returns a {@code Map} of all {@code SchoolLocation}s
+	 * @throws UnsupportedEncodingException
+	 *             Thrown if the character encoding to "UTF-8" fails
+	 */
 	@GET
 	@Path("/getLocations")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -31,26 +48,10 @@ public class LocationService {
 		for (SchoolLocation l : SchoolLocation.values()) {
 			locList.put(l, l.getName());
 		}
-		
+
 		// set encoding to UTF-8 for compatibility
 		response.setCharacterEncoding("UTF-8");
 
 		return locList;
-	}
-	
-	@GET
-	@Path("/getEventTypes")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Map<EventType, String> getEventTypes() throws UnsupportedEncodingException {
-		Map<EventType, String> eventTypes = new HashMap<EventType, String>();
-
-		for (EventType et : EventType.values()) {
-			eventTypes.put(et, et.getName());
-		}
-		
-		// set encoding to UTF-8 for compatibility
-		response.setCharacterEncoding("UTF-8");
-
-		return eventTypes;
 	}
 }

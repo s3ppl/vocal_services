@@ -1,7 +1,7 @@
 package pi.vocal.event;
 
 /**
- * This {@code enum} contains all known types an {@code Event} can have up to
+ * This {@code Enum} contains all known types an {@code Event} can have up to
  * this point.
  * 
  * @author s3ppl
