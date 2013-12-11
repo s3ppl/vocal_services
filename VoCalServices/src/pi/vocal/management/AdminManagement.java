@@ -18,6 +18,9 @@ import pi.vocal.user.Role;
  * 
  */
 public class AdminManagement {
+	
+	private AdminManagement() {
+	}
 
 	/**
 	 * Checks the given admin user for null and admin permissions.

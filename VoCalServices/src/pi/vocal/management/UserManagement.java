@@ -45,7 +45,7 @@ public class UserManagement {
 	private static final int MIN_PW_LEN = 6;
 
 	/**
-	 * Regular expression to match an email address
+	 * Simple regular expression to match an email address
 	 */
 	private static final String EMAIL_MATCH_STRING = "^[0-9A-Za-z_\\-.]+@[0-9A-Za-z_\\-.]+\\.[0-9A-Za-z_\\-.]+$";
 

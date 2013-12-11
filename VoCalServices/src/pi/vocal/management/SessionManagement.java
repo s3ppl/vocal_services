@@ -16,7 +16,7 @@ import pi.vocal.management.returncodes.ErrorCode;
 import pi.vocal.persistence.dto.User;
 
 /**
- * This class handles the login and logout of a user.
+ * This class handles the login and logout of a {@code User}.
  * 
  * @author s3ppl
  * 
@@ -35,6 +35,9 @@ public class SessionManagement {
 	 * of the session
 	 */
 	private static Map<UUID, User> sessions = new ConcurrentHashMap<UUID, User>();
+
+	private SessionManagement() {
+	}
 
 	/**
 	 * Searches for a given session id in the sessions map.
@@ -57,7 +60,9 @@ public class SessionManagement {
 	}
 
 	/**
-	 * Removes the session id of the user with given mail address if any.
+	 * Removes the session id of the {@code User} with given mail address if
+	 * any. Needed if the {@code User} logs in with a different device without
+	 * logging off first.
 	 * 
 	 * @param email
 	 *            The email address of the user that should be removed if
@@ -105,6 +110,8 @@ public class SessionManagement {
 
 	/**
 	 * Handles the login of user. Therefore a unique session id will be created.
+	 * If the user was already logged in, his old session will be removed and a
+	 * new session will be created.
 	 * 
 	 * @param email
 	 *            The email address of the user
@@ -204,8 +211,9 @@ public class SessionManagement {
 		// check for id existence to ensure 'overwrite only'
 		if (sessions.containsKey(sessionId)) {
 			sessions.put(sessionId, user);
-			
-			logger.debug("[UPDATE USER] updated user with sessionId" + sessionId);
+
+			logger.debug("[UPDATE USER] updated user with sessionId"
+					+ sessionId);
 		}
 	}
 }

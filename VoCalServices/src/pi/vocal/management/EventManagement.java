@@ -191,6 +191,31 @@ public class EventManagement {
 	}
 
 	/**
+	 * Checks if the {@code User} already attends an {@code Event} with the
+	 * given id.
+	 * 
+	 * @param user
+	 *            The {@code User} that may already attend the given eventId
+	 * @param eventId
+	 *            The id of the {@code Event} the {@code User} could already
+	 *            attend
+	 * @return Returns {@code true} if the {@code User} already attends the
+	 *         {@code Event} with the given id; false otherwise
+	 */
+	private static boolean userAlreadyAttendsEvent(User user, long eventId) {
+		boolean attends = false;
+
+		for (UserAttendance ua : user.getUserAttendance()) {
+			if (ua.getEventId() == eventId) {
+				attends = true;
+				break;
+			}
+		}
+
+		return attends;
+	}
+
+	/**
 	 * Invites all {@code User}s in the database that are having a {@code Grade}
 	 * contained in the given {@code Event} by adding an according
 	 * {@code UserAttendance} to them.
@@ -208,25 +233,29 @@ public class EventManagement {
 			// create a new UserAttendance object for each user with an
 			// according grade
 			for (User user : users) {
-				userAttendance = new UserAttendance();
-				userAttendance.setAttends(false);
-				userAttendance.setEventId(event.getEventId());
-				userAttendance.setUserId(user.getUserId());
+				// creating a new UserAttendance would create a database error
+				// if the user already attends this event
+				if (!userAlreadyAttendsEvent(user, event.getEventId())) {
+					userAttendance = new UserAttendance();
+					userAttendance.setAttends(false);
+					userAttendance.setEventId(event.getEventId());
+					userAttendance.setUserId(user.getUserId());
 
-				user.addUserAttendance(userAttendance);
-				event.addUserAttendance(userAttendance);
+					user.addUserAttendance(userAttendance);
+					event.addUserAttendance(userAttendance);
 
-				// persist the UserAttendance and update the references of the
-				// event and the current user
-				Session session = HibernateUtil.getSessionFactory()
-						.openSession();
-				session.beginTransaction();
-				session.save(userAttendance);
-				session.update(user);
-				session.update(event);
-				session.getTransaction().commit();
-				session.flush();
-				session.close();
+					// persist the UserAttendance and update the references of
+					// the event and the current user
+					Session session = HibernateUtil.getSessionFactory()
+							.openSession();
+					session.beginTransaction();
+					session.save(userAttendance);
+					session.update(user);
+					session.update(event);
+					session.getTransaction().commit();
+					session.flush();
+					session.close();
+				}
 			}
 		}
 	}
@@ -435,7 +464,7 @@ public class EventManagement {
 
 		// invite all users having an according grade
 		inviteUsersToEvent(event);
-		
+
 		// update the user in the session
 		SessionManagement.updateSessionUser(sessionId, user);
 	}
@@ -569,7 +598,7 @@ public class EventManagement {
 					startDate, endDate, type, childrenMayAttend,
 					disciplesMayAttend, trainersMayAttend, mastersMayAttend);
 
-			// TODO test what happens, if users already attend this event! 
+			// TODO test what happens, if users already attend this event!
 			// if attendance flags were changed - invite users
 			if (successCodes.contains(SuccessCode.ATTENDANCE_GRADES_CHANGED)) {
 				inviteUsersToEvent(event);

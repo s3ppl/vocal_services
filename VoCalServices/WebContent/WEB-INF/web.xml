@@ -5,13 +5,10 @@
 	id="WebApp_ID" version="3.0">
 
 	<display-name>VoCalServices</display-name>
-	
-	<!--servlet>
-		<servlet-name>database-init-servlet</servlet-name>
-		<servlet-class>pi.vocal.persistence.DatabaseInitializerServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet-->
-	
+
+	<!--servlet> <servlet-name>database-init-servlet</servlet-name> <servlet-class>pi.vocal.persistence.DatabaseInitializerServlet</servlet-class> 
+		<load-on-startup>1</load-on-startup> </servlet -->
+
 	<servlet>
 		<servlet-name>jersey-serlvet</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
