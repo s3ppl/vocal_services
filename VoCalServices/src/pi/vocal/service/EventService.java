@@ -183,7 +183,7 @@ public class EventService {
 	 *         Otherwise a {@code List} of {@code ErrorCode}s will be returned.
 	 */
 	@POST
-	@Path("/getEventsById")
+	@Path("/getEventById")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<?> getEventById(@FormParam("sessionid") UUID sessionId, @FormParam("eventid") long eventId) {
 

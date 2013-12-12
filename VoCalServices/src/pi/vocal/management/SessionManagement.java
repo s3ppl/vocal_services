@@ -199,8 +199,11 @@ public class SessionManagement {
 	 */
 	public synchronized static void updateSessionUser(UUID sessionId, User user) {
 		// check for id existence to ensure 'overwrite only'
-		if (sessions.containsKey(sessionId)) {
+		if (null != sessionId && sessions.containsKey(sessionId)) {
+			logger.debug("updating sessionId: " + sessionId + " with user: " + user.getEmail());
 			sessions.put(sessionId, user);
+		} else {
+			logger.warn("No user to update for sessionId: " + sessionId);
 		}
 	}
 }

@@ -452,6 +452,7 @@ public class EventManagement {
 		inviteUsersToEvent(event);
 
 		// update the user in the session
+		user = UserManagement.getUserById(user.getUserId());
 		SessionManagement.updateSessionUser(sessionId, user);
 	}
 
