@@ -134,6 +134,7 @@ public class PublicUser {
 			userEvent.setEventType(event.getEventType());
 			userEvent.setStartDate(event.getStartDate());
 			userEvent.setTitle(event.getTitle());
+			userEvent.setAttends(ua.isAttends());
 
 			this.userEvents.add(userEvent);
 		}
@@ -156,6 +157,8 @@ public class PublicUser {
 
 		private EventType eventType;
 		private long eventId;
+		
+		private boolean attends;
 
 		public long getStartDate() {
 			return startDate;
@@ -203,6 +206,14 @@ public class PublicUser {
 
 		public void setEventId(long eventId) {
 			this.eventId = eventId;
+		}
+
+		public boolean isAttends() {
+			return attends;
+		}
+
+		public void setAttends(boolean attends) {
+			this.attends = attends;
 		}
 	}
 }

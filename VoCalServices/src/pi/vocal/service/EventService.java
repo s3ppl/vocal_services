@@ -14,10 +14,12 @@ import javax.ws.rs.core.MediaType;
 
 import pi.vocal.event.EventType;
 import pi.vocal.management.EventManagement;
+import pi.vocal.management.SessionManagement;
 import pi.vocal.management.exception.VocalServiceException;
 import pi.vocal.management.helper.ResultConstants;
 import pi.vocal.management.returncodes.ErrorCode;
 import pi.vocal.persistence.dto.Event;
+import pi.vocal.persistence.dto.User;
 import pi.vocal.service.dto.JsonResponse;
 import pi.vocal.service.dto.PublicEvent;
 
@@ -185,10 +187,13 @@ public class EventService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<?> getEventById(@FormParam("sessionid") UUID sessionId, @FormParam("eventid") long eventId) {
 
+		// TODO refactor getEventById for id checking!
+		User user = SessionManagement.getUserBySessionId(sessionId);
+		
 		// get persistent event according to the
 		Event persistentEvent = EventManagement.getEventById(eventId);
 
-		if (null != persistentEvent) {
+		if (null != user && null != persistentEvent) {
 			JsonResponse<PublicEvent> response = new JsonResponse<>();
 			response.setSuccess(true);
 
@@ -198,8 +203,18 @@ public class EventService {
 			return response;
 		} else {
 			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
+			
+			List<ErrorCode> errorCodes = new ArrayList<>();			
+			if (null == user) {
+				errorCodes.add(ErrorCode.SESSION_INVALID);
+			}
+			
+			if (null == persistentEvent) {
+				errorCodes.add(ErrorCode.INVALID_EVENT_ID);
+			}
+			
 			errorResponse.setSuccess(false);
-			errorResponse.setContent(Arrays.asList(ErrorCode.INVALID_EVENT_ID));
+			errorResponse.setContent(errorCodes);
 
 			return errorResponse;
 		}

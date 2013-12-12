@@ -148,6 +148,7 @@ public class PublicEvent {
 			attendant.setLastName(user.getLastName());
 			attendant.setRole(user.getRole());
 			attendant.setSchoolLocation(user.getSchoolLocation());
+			attendant.setAttends(userAttendance.isAttends());
 
 			this.attendants.add(attendant);
 		}
@@ -171,6 +172,8 @@ public class PublicEvent {
 		private Grade grade;
 
 		private Role role;
+		
+		private boolean attends;
 
 		public String getFirstName() {
 			return firstName;
@@ -218,6 +221,14 @@ public class PublicEvent {
 
 		public void setRole(Role role) {
 			this.role = role;
+		}
+
+		public boolean isAttends() {
+			return attends;
+		}
+
+		public void setAttends(boolean attends) {
+			this.attends = attends;
 		}
 	}
 }
