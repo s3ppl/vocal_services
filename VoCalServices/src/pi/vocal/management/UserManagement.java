@@ -20,6 +20,7 @@ import pi.vocal.management.helper.ResultConstants;
 import pi.vocal.management.returncodes.ErrorCode;
 import pi.vocal.management.returncodes.SuccessCode;
 import pi.vocal.persistence.HibernateUtil;
+import pi.vocal.persistence.dto.Event;
 import pi.vocal.persistence.dto.User;
 import pi.vocal.persistence.dto.UserAttendance;
 import pi.vocal.user.Grade;
@@ -98,6 +99,45 @@ public class UserManagement {
 		session.close();
 
 		return result;
+	}
+	
+	private static void inviteNewUserToEvents(User user) throws VocalServiceException {
+		List<Event> events = EventManagement.getAllEvents();
+		
+		if (null == user) {
+			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR);
+		}
+		
+		boolean alreadyInvited = false;
+		for (Event event : events) {
+			if (event.getAttendantsGrades().contains(user.getGrade())) {
+				alreadyInvited = false;
+				
+				for (UserAttendance ua : user.getUserAttendance()) {
+					if (ua.getEventId() == event.getEventId()) {
+						alreadyInvited = true;
+						break;
+					}
+				}
+				
+				if (!alreadyInvited) {
+					UserAttendance userAttendance = new UserAttendance();
+					userAttendance.setAttends(false);
+					userAttendance.setEventId(event.getEventId());
+					userAttendance.setUserId(user.getUserId());
+					user.addUserAttendance(userAttendance);
+					event.addUserAttendance(userAttendance);
+					
+					Session session = HibernateUtil.getSessionFactory().openSession();
+					session.beginTransaction();
+					session.save(userAttendance);
+					session.update(user);
+					session.update(event);
+					session.getTransaction().commit();
+					session.close();
+				}
+			}
+		}
 	}
 
 	/**
@@ -275,6 +315,9 @@ public class UserManagement {
 			session.getTransaction().commit();
 			session.flush();
 			session.close();
+			
+			userDto = UserManagement.getUserByEmail(email);
+			inviteNewUserToEvents(userDto);
 		} catch (HibernateException he) {
 			logger.error(
 					"Could not create Account. Storing to the database failed. See nested Exception for further details.",

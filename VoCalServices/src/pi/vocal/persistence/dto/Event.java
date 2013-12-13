@@ -62,7 +62,7 @@ public class Event implements Serializable {
 	@OneToMany(mappedBy="eventId", fetch=FetchType.EAGER)
 	private Set<UserAttendance> userAttendances = new HashSet<>();
 	
-	@ElementCollection(targetClass=Grade.class)
+	@ElementCollection(targetClass=Grade.class, fetch=FetchType.EAGER)
 	@CollectionTable(name="event_grades")
 	private Set<Grade> attendantsGrades;
 

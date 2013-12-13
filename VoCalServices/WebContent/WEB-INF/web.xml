@@ -6,9 +6,6 @@
 
 	<display-name>VoCalServices</display-name>
 
-	<!--servlet> <servlet-name>database-init-servlet</servlet-name> <servlet-class>pi.vocal.persistence.DatabaseInitializerServlet</servlet-class> 
-		<load-on-startup>1</load-on-startup> </servlet -->
-
 	<servlet>
 		<servlet-name>jersey-serlvet</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
@@ -22,6 +19,12 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>bootstrap-servlet</servlet-name>
+		<servlet-class>pi.vocal.bootstrap.BootStrapServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>jersey-serlvet</servlet-name>
@@ -29,7 +32,7 @@
 	</servlet-mapping>
 
 	<resource-ref>
-		<description>MySQL Datasource example</description>
+		<description>VoCal database connection</description>
 		<res-ref-name>jdbc/vocalDB</res-ref-name>
 		<res-type>javax.sql.DataSource</res-type>
 		<res-auth>Container</res-auth>

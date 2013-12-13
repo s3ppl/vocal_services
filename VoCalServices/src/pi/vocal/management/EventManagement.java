@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 import pi.vocal.event.EventType;
 import pi.vocal.management.exception.VocalServiceException;
@@ -600,6 +601,17 @@ public class EventManagement {
 		}
 
 		return result;
+	}
+	
+	public static List<Event> getAllEvents() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		session.beginTransaction();
+		@SuppressWarnings("unchecked")
+		List<Event> events = session.createCriteria(Event.class).list();
+		session.getTransaction().commit();
+		session.close();
+		
+		return events;
 	}
 
 }
