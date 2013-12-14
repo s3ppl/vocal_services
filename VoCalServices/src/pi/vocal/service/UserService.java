@@ -208,12 +208,4 @@ public class UserService {
 		return response;
 	}
 
-	@POST
-	@Path("/deleteUser")
-	@Produces(MediaType.APPLICATION_JSON)
-	public JsonResponse<List<?>> deleteAccount() {
-		// TODO implement me! (deleteUser)
-		return null;
-	}
-
 }

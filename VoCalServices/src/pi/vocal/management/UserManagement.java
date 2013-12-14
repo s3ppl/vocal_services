@@ -491,7 +491,7 @@ public class UserManagement {
 	 *            The sessionId of the {@code User}
 	 * @param eventId
 	 *            The id of the {@code Event} the user wants to set his
-	 *            attendance of//TODO is 'of' the correct word?
+	 *            attendance to
 	 * @param attends
 	 *            Should be {@code true} if the {@code User} want to attend to
 	 *            the {@code Event}; {@code false} otherwise

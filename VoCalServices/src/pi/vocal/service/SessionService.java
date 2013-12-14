@@ -58,7 +58,7 @@ public class SessionService {
 			result.put(ResultConstants.LOGIN_USER_KEY, new PublicUser(
 					(User) result.get(ResultConstants.LOGIN_USER_KEY)));
 			response.setContent(result);
-		} catch (Exception e) { // TODO keep as exception!?
+		} catch (Exception e) {
 			JsonResponse<List<ErrorCode>> errorResponse = new JsonResponse<>();
 			errorResponse.setSuccess(false);
 

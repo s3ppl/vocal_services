@@ -185,8 +185,6 @@ public class EventService {
 	@Path("/getEventById")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonResponse<?> getEventById(@FormParam("sessionid") UUID sessionId, @FormParam("eventid") long eventId) {
-
-		// TODO refactor getEventById for id checking!
 		User user = SessionManagement.getUserBySessionId(sessionId);
 		
 		// get persistent event according to the
