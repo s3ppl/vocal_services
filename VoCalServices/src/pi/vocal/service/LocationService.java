@@ -11,7 +11,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import pi.vocal.event.EventType;
 import pi.vocal.user.SchoolLocation;
 
 /**
