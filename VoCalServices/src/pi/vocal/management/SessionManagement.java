@@ -85,7 +85,7 @@ public class SessionManagement {
 	 * 
 	 * @return A unique session id
 	 * @throws VocalServiceException
-	 *             Thrown if the maximum attempts of creation a unique session
+	 *             Thrown if the maximum attempts of creating a unique session
 	 *             id get reached.
 	 */
 	private static UUID generateSessionId() throws VocalServiceException {
@@ -126,9 +126,6 @@ public class SessionManagement {
 	public synchronized static Map<Enum<ResultConstants>, Object> login(String email, String password)
 			throws VocalServiceException {
 
-		// make sure the user won't get logged in twice
-		removeAlreadyLoggedInUser(email);
-
 		// get the according user from the database
 		User user = UserManagement.getUserByEmail(email);
 		Map<Enum<ResultConstants>, Object> result = new HashMap<Enum<ResultConstants>, Object>();
@@ -150,7 +147,10 @@ public class SessionManagement {
 			logger.error("Password encryption failed. See nested Exception for details.", e);
 			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR, e);
 		}
-
+		
+		// make sure the user won't get logged in twice
+		removeAlreadyLoggedInUser(email);
+		
 		// add the users session
 		UUID sessionId = generateSessionId();
 		sessions.put(sessionId, user);
