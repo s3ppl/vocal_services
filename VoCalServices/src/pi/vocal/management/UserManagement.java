@@ -100,26 +100,38 @@ public class UserManagement {
 
 		return result;
 	}
-	
+
+	/**
+	 * Invites a {@code User} to all {@code Event}s he has the according grade
+	 * for but is not yet invited to.
+	 * 
+	 * @param user
+	 *            The {@code User} object to invite to all missing {@code Event}
+	 *            s
+	 * @throws VocalServiceException
+	 *             Thrown if the given {@code User} object is null
+	 */
 	private static void inviteNewUserToEvents(User user) throws VocalServiceException {
 		List<Event> events = EventManagement.getAllEvents();
-		
+
 		if (null == user) {
 			throw new VocalServiceException(ErrorCode.INTERNAL_ERROR);
 		}
-		
+
 		boolean alreadyInvited = false;
 		for (Event event : events) {
 			if (event.getAttendantsGrades().contains(user.getGrade())) {
 				alreadyInvited = false;
-				
+
+				// check if the user is already invited to the current event
 				for (UserAttendance ua : user.getUserAttendance()) {
 					if (ua.getEventId() == event.getEventId()) {
 						alreadyInvited = true;
 						break;
 					}
 				}
-				
+
+				// if not already invited, do so
 				if (!alreadyInvited) {
 					UserAttendance userAttendance = new UserAttendance();
 					userAttendance.setAttends(false);
@@ -127,7 +139,7 @@ public class UserManagement {
 					userAttendance.setUserId(user.getUserId());
 					user.addUserAttendance(userAttendance);
 					event.addUserAttendance(userAttendance);
-					
+
 					Session session = HibernateUtil.getSessionFactory().openSession();
 					session.beginTransaction();
 					session.save(userAttendance);
@@ -315,7 +327,7 @@ public class UserManagement {
 			session.getTransaction().commit();
 			session.flush();
 			session.close();
-			
+
 			userDto = UserManagement.getUserByEmail(email);
 			inviteNewUserToEvents(userDto);
 		} catch (HibernateException he) {
