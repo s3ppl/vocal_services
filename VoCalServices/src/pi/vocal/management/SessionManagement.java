@@ -103,6 +103,8 @@ public class SessionManagement {
 						+ MAX_SESSION_ID_CREATION_CYCLES);
 				throw new VocalServiceException(ErrorCode.INTERNAL_ERROR);
 			}
+			
+			count++;
 		}
 
 		return sessionId;
